@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Progresso - Foco e Saúde</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Fonte estilo Instagram Logo -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos adicionais */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff; /* Fundo branco como Instagram */
+        }
+        /* Classe para abas de conteúdo ocultas */
+        .hidden-tab {
+            display: none;
+        }
+        /* Animação suave para transições */
+        .content-tab {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Estilo personalizado para cards */
+        .card {
+            background: white;
+            border-radius: 0.5rem; /* Menos arredondado */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(0); /* Remover hover */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Cabeçalho Fixo (Estilo Instagram) -->
+    <header class="fixed top-0 left-0 w-full bg-white border-b border-gray-200 flex items-center justify-between p-4 z-10 h-16">
+        <h1 class="text-2xl font-bold text-gray-800" style="font-family: 'Pacifico', cursive;">Meu Progresso</h1>
+        <button class_="text-gray-700 hover:text-green-600">
+            <i data-lucide="message-circle" class="w-6 h-6"></i>
+        </button>
+    </header>
+
+    <div id="app" class="flex flex-col min-h-screen">
+        <!-- Conteúdo Principal que será trocado -->
+        <main class="flex-1 overflow-y-auto pt-16 pb-16"> <!-- Padding para header/footer fixos -->
+            
+            <!-- ABA INÍCIO (AGORA O FEED) -->
+            <div id="inicio" class="content-tab">
+                <!-- Feed de Refeições -->
+                <div id="feed-container" class="space-y-0">
+                    <!-- Post 1 (Exemplo Novo) -->
+                    <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="post-1">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm">ana_paula</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1525351484163-7529414344d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de um café da manhã com ovos e abacate" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Caf%C3%A9';"
+                        >
+                        <!-- Ações do Post (Simulado) -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm"> <!-- Reduzido pb-4 para pb-2 -->
+                            <p><span class="font-semibold">ana_paula</span> <b>[Café da Manhã]</b> Começando o dia bem! 🥑 Ovos e abacate.</p>
+                            <span class="text-xs text-gray-400 uppercase mt-1 block">segunda-feira, 20 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                <!-- Comentário FAKE da Nutri -->
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold">nutri_camila</span> <span class="text-blue-600 font-medium">[Nutri]</span> Que ótimo começo de dia, Ana! 👏</p>
+                                </div>
+                                <!-- Comentários do storage vão aqui -->
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                    </div>
+                    
+                    <!-- Post 2 (Exemplo Novo) -->
+                    <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="post-2">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm">ana_paula</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de um almoço com salmão e salada" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Almo%C3%A7o';"
+                        >
+                        <!-- Ações do Post (Simulado) -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold">ana_paula</span> <b>[Almoço]</b> Almoço de hoje focado na meta. Salmão e salada. 🥗</p>
+                            <span class="text-xs text-gray-400 uppercase mt-1 block">domingo, 19 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                <!-- Comentários do storage vão aqui -->
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post 3 (Exemplo Novo - Exceção) -->
+                    <div class="w-full bg-red-50 border-b border-red-200 post-container" data-post-id="post-3">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm">ana_paula</span>
+                            <span class="ml-2 px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-xs font-medium">Exceção</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de um pedaço de bolo" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/FEE2E2/9B2C2C?text=Foto+de+Bolo';"
+                        >
+                        <!-- Ações do Post (Simulado) -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold">ana_paula</span> <b>[Lanche]</b> Hoje teve exceção... 🙈 Bolo de aniversário. Mas amanhã volto 100%!</p>
+                            <span class="text-xs text-gray-400 uppercase mt-1 block">sábado, 18 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                <!-- Comentário FAKE da Nutri -->
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold">nutri_camila</span> <span class="text-blue-600 font-medium">[Nutri]</span> Acontece, Ana! O importante é o equilíbrio e voltar ao foco amanhã. Aproveite seu momento! 😉</p>
+                                </div>
+                                <!-- Comentários do storage vão aqui -->
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                    </div>
+                    
+                    <!-- Post 4 (Exemplo Novo) -->
+                    <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="post-4">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm">ana_paula</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1473093226795-af9932fe5856?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de um jantar com macarrão de abobrinha" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Jantar';"
+                        >
+                        <!-- Ações do Post (Simulado) -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold">ana_paula</span> <b>[Jantar]</b> Jantar mais leve: macarrão de abobrinha. 😋</p>
+                            <span class="text-xs text-gray-400 uppercase mt-1 block">sexta-feira, 17 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                <!-- Comentários do storage vão aqui -->
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post 5 (Adicionado) -->
+                    <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="post-5">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm">ana_paula</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de tigela de iogurte" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Iogurte';"
+                        >
+                        <!-- Ações do Post (Simulado) -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold">ana_paula</span> <b>[Lanche da Tarde]</b> Iogurte com frutas vermelhas. Estava uma delícia!</p>
+                            <span class="text-xs text-gray-400 uppercase mt-1 block">quinta-feira, 16 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                <!-- Comentários do storage vão aqui -->
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post 6 (Adicionado) -->
+                    <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="post-6">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm">ana_paula</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1606803789360-12b0d0c36192?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de panquecas de aveia" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Panquecas';"
+                        >
+                        <!-- Ações do Post (Simulado) -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold">ana_paula</span> <b>[Café da Manhã]</b> Panquecas de aveia para variar. 🥞</p>
+                            <span class="text-xs text-gray-400 uppercase mt-1 block">quinta-feira, 16 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                <!-- Comentário FAKE da Nutri -->
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold">nutri_camila</span> <span class="text-blue-600 font-medium">[Nutri]</span> Ótima variação! Adicionar uma fonte de proteína junto, como ovos mexidos, pode te dar ainda mais saciedade.</p>
+                                </div>
+                                <!-- Comentários do storage vão aqui -->
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ABA ADICIONAR POST (Antigo Diário) -->
+            <div id="add-post" class="content-tab hidden-tab p-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Nova Refeição 📸</h2>
+                
+                <div class="card p-4 mb-6 shadow-none border border-gray-200 rounded-lg">
+                    <!-- Preview da Imagem -->
+                    <img id="foto-preview" class="hidden w-full h-48 object-cover rounded-lg mb-3 border border-gray-200" alt="Preview da refeição">
+
+                    <!-- Input da Foto -->
+                    <input type="file" id="diario-foto-input" class="hidden" accept="image/*">
+                    <label for="diario-foto-input" class="w-full cursor-pointer bg-gray-100 hover:bg-gray-200 border border-dashed border-gray-300 text-gray-600 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-center transition-all mb-3">
+                        <i data-lucide="camera" class="w-4 h-4 mr-2"></i>
+                        <span id="foto-label">Adicionar Foto da Refeição</span>
+                    </label>
+
+                    <!-- Tipo de Refeição -->
+                    <select id="diario-refeicao" class="w-full border rounded-xl p-3 text-sm border-green-200 focus:ring-2 focus:ring-green-300 bg-white mb-3">
+                        <option>Café da Manhã</option>
+                        <option>Almoço</option>
+                        <option>Jantar</option>
+                        <option>Lanche da Manhã</option>
+                        <option>Lanche da Tarde</option>
+                        <option>Ceia</option>
+                    </select>
+
+                    <!-- Anotações -->
+                    <textarea
+                        id="diario-texto"
+                        placeholder="Como você se sentiu? Alguma observação sobre a refeição? (Ex: comi rápido, me senti inchado...)"
+                        class="w-full p-3 border rounded-xl border-green-200 mb-3 text-sm focus:ring-2 focus:ring-green-300 focus:border-green-300 transition resize-none"
+                        rows="3"
+                    ></textarea>
+                    
+                    <button id="salvar-diario" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-3 rounded-xl text-sm font-semibold hover:opacity-90 transition-all shadow-md">
+                        Publicar
+                    </button>
+                </div>
+                
+                <h3 class="text-lg font-semibold text-gray-800 mb-3 hidden">Suas Refeições</h3>
+                <div id="diario-entradas" class="space-y-4 hidden">
+                    <!-- Entradas de exemplo (movidas para o feed) -->
+                </div>
+            </div>
+
+            <!-- ABA PESO -->
+            <div id="peso" class="content-tab hidden-tab p-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Acompanhamento de Peso ⚖️</h2>
+                <p class="text-gray-600 mb-4">Monitore sua evolução de peso durante a jornada.</p>
+                
+                <div class="card p-4 mb-6">
+                    <div class="flex mb-3">
+                        <input
+                            id="peso-input"
+                            type="number"
+                            step="0.1"
+                            placeholder="Digite seu peso atual (kg)"
+                            class="flex-1 border rounded-l-xl p-3 text-sm border-green-200 focus:ring-2 focus:ring-green-300"
+                        />
+                        <button id="add-peso" class="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 rounded-r-xl text-sm font-bold hover:opacity-90 transition-all">
+                            Adicionar
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 text-center">
+                        Tente se pesar sempre no mesmo horário, de preferência pela manhã.
+                    </p>
+                </div>
+                
+                <div class="card p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Histórico de Peso</h3>
+                    <ul id="lista-pesos" class="space-y-3">
+                        <li class="flex justify-between items-center p-3 border-b border-gray-100 last:border-0">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                    <i data-lucide="scale" class="w-4 h-4 text-green-500"></i>
+                                </div>
+                                <span class="text-gray-700">25/09/2025</span>
+                            </div>
+                            <span class="font-semibold text-gray-800">83.1 kg</span>
+                        </li>
+                        <li class="flex justify-between items-center p-3 border-b border-gray-100 last:border-0">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                    <i data-lucide="scale" class="w-4 h-4 text-green-500"></i>
+                                </div>
+                                <span class="text-gray-700">18/09/2025</span>
+                            </div>
+                            <span class="font-semibold text-gray-800">83.9 kg</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ABA METAS -->
+            <div id="metas" class="content-tab hidden-tab p-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Minhas Metas 🎯</h2>
+                <p class="text-gray-600 mb-4">Acompanhe os objetivos definidos com seu profissional.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card p-5">
+                        <div class="flex items-center mb-2">
+                            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3 shrink-0">
+                                <i data-lucide="flag" class="w-5 h-5 text-red-500"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Peso Alvo</h3>
+                                <p class="text-sm text-gray-600">Seu objetivo principal</p>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800 text-center my-4">75.0 <span class="text-xl font-normal">kg</span></p>
+                    </div>
+
+                    <div class="card p-5">
+                        <div class="flex items-center mb-2">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3 shrink-0">
+                                <i data-lucide="glass-water" class="w-5 h-5 text-blue-500"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Consumo de Água</h3>
+                                <p class="text-sm text-gray-600">Meta diária</t>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800 text-center my-4">2.5 <span class="text-xl font-normal">Litros</span></p>
+                    </div>
+
+                    <div class="card p-5 col-span-1 md:col-span-2">
+                        <div class="flex items-center mb-2">
+                            <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3 shrink-0">
+                                <i data-lucide="activity" class="w-5 h-5 text-yellow-700"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Atividade Física</h3>
+                                <p class="text-sm text-gray-600">Meta semanal</t>
+                            </div>
+                        </div>
+                        <p class="text-2xl font-bold text-gray-800 text-center my-4">3x <span class="text-xl font-normal">por semana (30 min)</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ABA PERFIL (Antiga Consultas) -->
+            <div id="perfil" class="content-tab hidden-tab p-4">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Meu Perfil</h2>
+
+                <!-- Seção de Perfil -->
+                <div class="flex items-center mb-6">
+                    <img src="https://placehold.co/80x80/EBFBE5/34592A?text=AP" class="w-20 h-20 rounded-full mr-4 border-2 border-gray-200" alt="Foto de Perfil">
+                    <div>
+                        <h3 class="text-xl font-semibold">ana_paula</h3>
+                        <p class="text-gray-600">Em jornada de reeducação alimentar.</p>
+                        <button class="mt-2 text-sm font-semibold text-gray-700 bg-gray-200 px-4 py-1 rounded-lg hover:bg-gray-300">Editar Perfil</button>
+                    </div>
+                </div>
+                
+                <!-- Stats -->
+                <div class="grid grid-cols-3 gap-4 text-center mb-6">
+                    <div>
+                        <p class="text-2xl font-bold">14</p> <!-- Atualizado de 12 para 14 com os novos posts -->
+                        <p class="text-sm text-gray-500">Refeições</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold">85.0 <span class="text-lg">kg</span></p>
+                        <p class="text-sm text-gray-500">Inicial</p>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold">75.0 <span class="text-lg">kg</span></p>
+                        <p class="text-sm text-gray-500">Meta</p>
+                    </div>
+                </div>
+
+                <!-- Próxima Consulta (Movido do Início) -->
+                <div class="card p-5 mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200">
+                    <div class="flex items-start">
+                        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mr-4 shrink-0">
+                            <i data-lucide="calendar" class="text-green-500 w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800">Próxima Consulta</h3>
+                            <p class="text-gray-700 mt-1"><b>20 de outubro de 2025</b> às <b>15h</b></p>
+                            <p class="text-gray-600 text-sm mt-2">Com <b>Dr(a). [Nome do Profissional]</b></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Próximos Exames (Movido de Consultas) -->
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Próximos Exames</h3>
+                <div class="space-y-4">
+                    <div class="card p-4 border border-gray-200 shadow-none">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Exames de Sangue</h4>
+                                <p class="text-gray-600 text-sm mt-1">Coletar até 25/10/2025</p>
+                            </div>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pendente</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Barra de Navegação Inferior -->
+        <footer class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around py-3 h-16 items-center">
+            <button data-tab="inicio" class="nav-button flex flex-col items-center text-sm text-green-600 transition-colors w-16">
+                <i data-lucide="home" class="w-6 h-6 mb-1"></i>
+                <!-- <span class="text-xs">Início</span> -->
+            </button>
+            <button data-tab="peso" class="nav-button flex flex-col items-center text-sm text-gray-500 transition-colors w-16">
+                <i data-lucide="scale" class="w-6 h-6 mb-1"></i>
+                <!-- <span class="text-xs">Peso</span> -->
+            </button>
+            <button data-tab="add-post" class="nav-button flex flex-col items-center text-sm text-gray-500 transition-colors w-16">
+                <i data-lucide="plus-square" class="w-6 h-6 mb-1"></i>
+                <!-- <span class="text-xs">Postar</span> -->
+            </button>
+            <button data-tab="metas" class="nav-button flex flex-col items-center text-sm text-gray-500 transition-colors w-16 text-center">
+                <i data-lucide="flag" class="w-6 h-6 mb-1"></i>
+                <!-- <span class="text-xs">Metas</span> -->
+            </button>
+            <button data-tab="perfil" class="nav-button flex flex-col items-center text-sm text-gray-500 transition-colors w-16">
+                <i data-lucide="user" class="w-6 h-6 mb-1"></i>
+                <!-- <span class="text-xs">Perfil</span> -->
+            </button>
+        </footer>
+    </div>
+    
+    <!-- Modal de Alerta Customizado -->
+    <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center card">
+            <p id="modal-message" class="text-gray-700 mb-4"></p>
+            <button id="modal-close" class="bg-green-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-600 transition">
+                OK
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializa os ícones da biblioteca Lucide
+            lucide.createIcons();
+
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentTabs = document.querySelectorAll('.content-tab');
+            const pageTitle = document.getElementById('page-title'); // Referência ao novo título
+            const feedContainer = document.getElementById('feed-container');
+
+            // --- CARREGAR ESTADO INICIAL (CURTIDAS E COMENTÁRIOS) ---
+            function loadLikesAndComments() {
+                const likes = JSON.parse(localStorage.getItem('meuProgressoLikes')) || {};
+                const comments = JSON.parse(localStorage.getItem('meuProgressoComments')) || {};
+
+                document.querySelectorAll('.post-container').forEach(post => {
+                    const postId = post.dataset.postId;
+                    if (!postId) return;
+
+                    // Carregar Curtidas
+                    if (likes[postId]) {
+                        const likeButton = post.querySelector('[data-lucide="heart"]');
+                        if (likeButton) {
+                            likeButton.classList.add('fill-red-500', 'text-red-500');
+                        }
+                    }
+
+                    // Carregar Comentários
+                    const commentList = post.querySelector('.comment-list');
+                    if (comments[postId] && commentList) {
+                        comments[postId].forEach(comment => {
+                            const commentHtml = `
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold">${comment.user}</span> ${comment.text}</p>
+                                </div>
+                            `;
+                            commentList.insertAdjacentHTML('beforeend', commentHtml);
+                        });
+                    }
+                });
+            }
+            
+            // --- FUNÇÕES DE MANIPULAÇÃO DO FEED ---
+
+            // Lógica de Curtir
+            function handleLikeClick(buttonEl) {
+                const post = buttonEl.closest('.post-container');
+                const postId = post.dataset.postId;
+                if (!postId) return;
+
+                buttonEl.classList.toggle('fill-red-500');
+                buttonEl.classList.toggle('text-red-500');
+                
+                const isLiked = buttonEl.classList.contains('fill-red-500');
+                let likes = JSON.parse(localStorage.getItem('meuProgressoLikes')) || {};
+
+                if (isLiked) {
+                    likes[postId] = true;
+                } else {
+                    delete likes[postId];
+                }
+                localStorage.setItem('meuProgressoLikes', JSON.stringify(likes));
+            }
+
+            // Lógica de Ver Comentários
+            function handleViewCommentsClick(buttonEl) {
+                const post = buttonEl.closest('.post-container');
+                const commentSection = post.querySelector('.comment-section');
+                if (commentSection) {
+                    commentSection.classList.toggle('hidden');
+                }
+            }
+
+            // Lógica de Adicionar Comentário
+            function handleAddComment(inputEl) {
+                const text = inputEl.value.trim();
+                if (text === '') return;
+
+                const post = inputEl.closest('.post-container');
+                const postId = post.dataset.postId;
+                const commentList = post.querySelector('.comment-list');
+                if (!postId || !commentList) return;
+
+                const newComment = {
+                    user: 'ana_paula', // Usuário logado
+                    text: text
+                };
+
+                // Adicionar ao UI
+                const commentHtml = `
+                    <div class="text-sm comment-item">
+                        <p><span class="font-semibold">${newComment.user}</span> ${newComment.text}</p>
+                    </div>
+                `;
+                commentList.insertAdjacentHTML('beforeend', commentHtml);
+                inputEl.value = ''; // Limpar input
+
+                // Salvar no localStorage
+                let comments = JSON.parse(localStorage.getItem('meuProgressoComments')) || {};
+                if (!comments[postId]) {
+                    comments[postId] = [];
+                }
+                comments[postId].push(newComment);
+                localStorage.setItem('meuProgressoComments', JSON.stringify(comments));
+
+                // Abrir seção de comentários se estiver fechada
+                const commentSection = post.querySelector('.comment-section');
+                if (commentSection && commentSection.classList.contains('hidden')) {
+                    commentSection.classList.remove('hidden');
+                }
+            }
+
+
+            // --- LÓGICA DE NAVEGAÇÃO ENTRE ABAS ---
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTabId = button.dataset.tab;
+                    showTab(targetTabId);
+                });
+            });
+
+            // --- LÓGICA DO MODAL DE ALERTA ---
+            const modal = document.getElementById('custom-modal');
+            const modalMessage = document.getElementById('modal-message');
+            const modalCloseBtn = document.getElementById('modal-close');
+
+            function showModal(message) {
+                modalMessage.textContent = message;
+                modal.classList.remove('hidden');
+            }
+            if (modalCloseBtn) {
+                modalCloseBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                });
+            }
+            
+            // --- LÓGICA DO DIÁRIO ALIMENTAR ---
+            const diarioTexto = document.getElementById('diario-texto');
+            const diarioRefeicao = document.getElementById('diario-refeicao');
+            const salvarDiarioBtn = document.getElementById('salvar-diario');
+            const feedEntradas = document.getElementById('feed-container'); // MUDOU: Target é o feed
+            const fotoInput = document.getElementById('diario-foto-input');
+            const fotoPreview = document.getElementById('foto-preview');
+            const fotoLabel = document.getElementById('foto-label');
+
+            let fotoUrl = null; // Armazena a URL da imagem (base64)
+
+            // Preview da imagem
+            if (fotoInput) {
+                fotoInput.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            fotoUrl = e.target.result;
+                            fotoPreview.src = fotoUrl;
+                            fotoPreview.classList.remove('hidden');
+                            fotoLabel.textContent = file.name; // Mostra o nome do arquivo
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // Salvar diário
+            if (salvarDiarioBtn) {
+                salvarDiarioBtn.addEventListener('click', () => {
+                    const texto = diarioTexto.value.trim();
+                    const refeicao = diarioRefeicao.value;
+                    const data = new Date();
+                    const dataFormatada = data.toLocaleDateString('pt-BR', { 
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                    });
+                    const postId = `post-${Date.now()}`; // ID Único para o novo post
+
+                    // NOVO HTML DO POST (Estilo Instagram)
+                    const novaEntradaHTML = `
+                        <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="${postId}">
+                            <!-- Cabeçalho do Post -->
+                            <div class="flex items-center p-3">
+                            <img src="${fotoUrl || 'https://placehold.co/600x400/EBFBE5/34592A?text=Sem+Foto'}" alt="Refeição" class="w-full h-auto max-h-[70vh] object-cover">
+                            <!-- Ações do Post (Simulado) -->
+                            <div class="flex items-center space-x-4 p-3">
+                                <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                                <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                            </div>
+                            <!-- Legenda do Post -->
+                            <div class="px-3 pb-2 text-sm">
+                                <p><span class="font-semibold">ana_paula</span> <b>[${refeicao}]</b> ${texto.replace(/\n/g, '<br>') || 'Sem legenda.'}</p>
+                                <span class="text-xs text-gray-400 uppercase mt-1 block">${dataFormatada}</span>
+                            </div>
+                            <!-- Seção de Comentários -->
+                            <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                            <div class="comment-section hidden px-3 pb-2">
+                                <div class="comment-list space-y-1">
+                                    <!-- Comentários do storage vão aqui -->
+                                </div>
+                            </div>
+                            <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                        </div>
+                    `;
+                    
+                    feedEntradas.insertAdjacentHTML('afterbegin', novaEntradaHTML);
+                    lucide.createIcons(); // Recria ícones para o novo post
+                    
+                    // Limpa os campos
+                    diarioTexto.value = '';
+                    fotoInput.value = ''; // Limpa o input de arquivo
+                    fotoPreview.src = '';
+                    fotoPreview.classList.add('hidden');
+                    fotoUrl = null;
+                    fotoLabel.textContent = 'Adicionar Foto da Refeição';
+
+                    // Manda o usuário de volta para o feed
+                    showTab('inicio');
+                });
+            }
+            
+            // --- LÓGICA DO PESO ---
+            const pesoInput = document.getElementById('peso-input');
+            const addPesoBtn = document.getElementById('add-peso');
+            const listaPesos = document.getElementById('lista-pesos');
+
+            if (addPesoBtn) {
+                addPesoBtn.addEventListener('click', () => {
+                    const valor = parseFloat(pesoInput.value);
+                    if (isNaN(valor) || valor <= 0) {
+                        showModal('Por favor, insira um peso válido.');
+                        return;
+                    }
+                    const data = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    const novoPesoHTML = `
+                        <li class="flex justify-between items-center p-3 border-b border-gray-100 last:border-0">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                    <i data-lucide="scale" class="w-4 h-4 text-green-500"></i>
+                                </div>
+                                <span class="text-gray-700">${data}</span>
+                            </div>
+                            <span class="font-semibold text-gray-800">${valor.toFixed(1)} kg</span>
+                        </li>
+                    `;
+                    listaPesos.insertAdjacentHTML('afterbegin', novoPesoHTML);
+                    lucide.createIcons();
+                    pesoInput.value = '';
+                });
+            }
+
+            // --- INICIALIZAÇÃO E EVENT LISTENERS DO FEED ---
+            loadLikesAndComments(); // Carrega curtidas e comentários salvos
+
+            // Event Delegation para ações do feed
+            if (feedContainer) {
+                feedContainer.addEventListener('click', (e) => {
+                    // Lidar com clique no botão de curtir
+                    if (e.target.dataset.lucide === 'heart') {
+                        handleLikeClick(e.target);
+                    }
+                    // Lidar com clique para ver comentários (ícone ou texto)
+                    if (e.target.classList.contains('view-comments-btn')) {
+                        e.preventDefault();
+                        handleViewCommentsClick(e.target);
+                    }
+                });
+
+                feedContainer.addEventListener('keydown', (e) => {
+                    // Lidar com "Enter" no input de comentário
+                    if (e.target.classList.contains('add-comment-input') && e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddComment(e.target);
+                    }
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>
+
