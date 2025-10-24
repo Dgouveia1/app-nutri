@@ -14,18 +14,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
-        // Adiciona a cor personalizada (verde) ao Tailwind
+        // Adiciona a cor personalizada (Novo Tom #A2574F) ao Tailwind
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         primary: {
-                            light: '#ecfdf5',      // emerald-50
-                            DEFAULT: '#10b981',    // emerald-500
-                            dark: '#059669',      // emerald-600
-                            darker: '#065f46',    // emerald-800
-                            text: '#d1fae5',      // emerald-100
-                            'text-darker': '#a7f3d0' // emerald-200
+                            light: '#F6EAE9',      // Tom pastel claro
+                            DEFAULT: '#A2574F',    // Cor Principal
+                            dark: '#8E4B45',      // Tom escuro
+                            darker: '#703A35',    // Tom bem escuro (Sidebar)
+                            text: '#F6EAE9',      // Texto claro (Sidebar)
+                            'text-darker': '#EADAD8' // Texto claro (Sidebar)
                         }
                     }
                 }
@@ -35,7 +35,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5; /* Fundo estilo rede social (cinza muito claro) */
+            background-color: #F6EAE9; /* Fundo Pastel (primary-light) */
         }
         /* Esconde abas de conteúdo principal */
         .main-tab {
@@ -72,7 +72,7 @@
             animation: fadeIn 0.3s ease-in-out;
         }
 
-        /* Story ring */
+        /* Story ring (mantido como gradiente) */
         .story-ring {
             padding: 2px;
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
@@ -86,6 +86,41 @@
         input[type='number'] {
             -moz-appearance: textfield;
         }
+
+        /* Estilos do Calendário */
+        .calendar-day {
+            transition: all 0.2s ease;
+        }
+        .calendar-day:hover {
+            background-color: #fdfafa;
+        }
+        .calendar-day.today {
+            background-color: #F6EAE9;
+            border: 1px solid #EADAD8;
+        }
+        .calendar-day.selected {
+            background-color: #A2574F;
+            color: white;
+            font-weight: bold;
+        }
+        .calendar-day.has-event {
+            position: relative;
+        }
+        .calendar-day.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: #A2574F;
+        }
+        .calendar-day.selected.has-event::after {
+            background-color: white;
+        }
+
     </style>
 </head>
 <body class="text-gray-800">
@@ -93,7 +128,12 @@
     <div id="app" class="flex h-screen overflow-hidden">
         
         <!-- === BARRA LATERAL (SIDEBAR) === -->
-        <aside class="w-64 bg-primary-darker text-primary-text flex flex-col shrink-0">
+        <!-- Otimizado para Mobile: 
+             - `fixed` e `-translate-x-full` por padrão (escondido fora da tela).
+             - `lg:translate-x-0` e `lg:static` (visível e estático em telas grandes).
+             - `z-30` para ficar acima do overlay.
+        -->
+        <aside id="sidebar" class="fixed top-0 left-0 z-30 w-64 h-full bg-primary-darker text-primary-text flex flex-col shrink-0 transform -translate-x-full transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen">
             <!-- Logo/Título -->
             <div class="h-16 flex items-center justify-center shadow-md">
                 <i data-lucide="clipboard-pulse" class="text-primary-text-darker w-6 h-6 mr-3"></i>
@@ -128,23 +168,34 @@
             <div class="p-4 border-t border-primary-dark">
                 <div class="flex items-center">
                     <img 
-                        src="https://placehold.co/40x40/10b981/065f46?text=DR" 
+                        src="https://placehold.co/40x40/A2574F/F6EAE9?text=DR" 
                         alt="Foto do Profissional"
                         class="w-10 h-10 rounded-full border-2 border-primary-text-darker"
                     />
                     <div class="ml-3">
-                        <p class="text-sm font-semibold">Dr(a). [Seu Nome]</p>
+                        <p class="text-sm font-semibold">Dr. Jean Carlos</p>
                         <p class="text-xs text-primary-text-darker">Nutricionista</p>
                     </div>
                 </div>
             </div>
         </aside>
 
+        <!-- Overlay para fechar sidebar no mobile -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
+
+
         <!-- === CONTEÚDO PRINCIPAL === -->
-        <main class="flex-1 flex flex-col overflow-y-auto">
+        <!-- Otimizado para Mobile: `w-full` para ocupar 100% da largura -->
+        <main class="w-full flex-1 flex flex-col overflow-y-auto">
             <!-- Cabeçalho do Conteúdo -->
             <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
-                <h2 id="page-title" class="text-xl font-semibold text-gray-800">Dashboard</h2>
+                <div class="flex items-center space-x-4">
+                    <!-- Botão Menu (Hamburger) - Visível apenas no mobile (lg:hidden) -->
+                    <button id="menu-toggle" class="lg:hidden text-gray-500 hover:text-primary">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                    <h2 id="page-title" class="text-xl font-semibold text-gray-800">Dashboard</h2>
+                </div>
                 <div class="flex items-center space-x-4">
                     <button class="text-gray-500 hover:text-primary relative">
                         <i data-lucide="bell" class="w-5 h-5"></i>
@@ -157,7 +208,7 @@
             </header>
 
             <!-- Área de Conteúdo (Abas) -->
-            <div class="flex-1 p-6 overflow-y-auto">
+            <div class="flex-1 p-4 md:p-6 overflow-y-auto">
 
                 <!-- === ABA 1: FEED DE PACIENTES (NOVO PADRÃO) === -->
                 <div id="feed" class="main-tab fade-in">
@@ -173,7 +224,7 @@
                                 <!-- Header -->
                                 <div class="p-4 flex items-center justify-between border-b border-gray-100">
                                     <div class="flex items-center">
-                                        <img src="https://placehold.co/32x32/dcfce7/15803d?text=AC" class="w-8 h-8 rounded-full mr-3" alt="Ana Clara">
+                                        <img src="https://placehold.co/32x32/F6EAE9/703A35?text=AC" class="w-8 h-8 rounded-full mr-3" alt="Ana Clara">
                                         <span class="font-medium text-gray-800">Ana Clara</span>
                                     </div>
                                     <span class="text-xs text-gray-500">segunda-feira, 20/10</span>
@@ -182,7 +233,7 @@
                                 <img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
                                      alt="Foto de ovos e abacate"
                                      class="w-full h-auto max-h-[60vh] object-cover"
-                                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Refei%C3%A7%C3%A3o';">
+                                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F6EAE9/A2574F?text=Foto+de+Refei%C3%A7%C3%A3o';">
                                 <!-- Conteúdo -->
                                 <div class="p-4">
                                     <span class="text-xs font-semibold uppercase text-primary-dark bg-primary-light px-2 py-0.5 rounded-full">Café da Manhã</span>
@@ -201,7 +252,7 @@
                                 </div>
                                 <!-- Input de Comentário -->
                                 <div class="bg-gray-50 p-3 flex items-center space-x-2 border-t border-gray-100">
-                                    <img src="https://placehold.co/32x32/10b981/065f46?text=DR" class="w-8 h-8 rounded-full" alt="Doutor(a)">
+                                    <img src="https://placehold.co/32x32/A2574F/F6EAE9?text=DR" class="w-8 h-8 rounded-full" alt="Doutor(a)">
                                     <input type="text" placeholder="Adicionar um comentário..." class="flex-1 w-full bg-gray-100 border border-gray-200 rounded-full text-sm px-4 py-1.5 focus:ring-2 focus:ring-primary focus:border-primary">
                                     <button class="text-primary hover:text-primary-dark text-sm font-medium pl-2">Enviar</button>
                                 </div>
@@ -221,7 +272,7 @@
                                 <img src="https://images.unsplash.com/photo-1490645935967-10de6ba1a033?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
                                      alt="Foto de salmão e salada"
                                      class="w-full h-auto max-h-[60vh] object-cover"
-                                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Refei%C3%A7%C3%A3o';">
+                                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F6EAE9/A2574F?text=Foto+de+Refei%C3%A7%C3%A3o';">
                                 <!-- Conteúdo -->
                                 <div class="p-4">
                                     <span class="text-xs font-semibold uppercase text-primary-dark bg-primary-light px-2 py-0.5 rounded-full">Almoço</span>
@@ -240,7 +291,7 @@
                                 </div>
                                 <!-- Input de Comentário -->
                                 <div class="bg-gray-50 p-3 flex items-center space-x-2 border-t border-gray-100">
-                                    <img src="https://placehold.co/32x32/10b981/065f46?text=DR" class="w-8 h-8 rounded-full" alt="Doutor(a)">
+                                    <img src="https://placehold.co/32x32/A2574F/F6EAE9?text=DR" class="w-8 h-8 rounded-full" alt="Doutor(a)">
                                     <input type="text" placeholder="Adicionar um comentário..." class="flex-1 w-full bg-gray-100 border border-gray-200 rounded-full text-sm px-4 py-1.5 focus:ring-2 focus:ring-primary focus:border-primary">
                                     <button class="text-primary hover:text-primary-dark text-sm font-medium pl-2">Enviar</button>
                                 </div>
@@ -251,7 +302,7 @@
                                 <!-- Header -->
                                 <div class="p-4 flex items-center justify-between border-b border-gray-100">
                                     <div class="flex items-center">
-                                        <img src="https://placehold.co/32x32/dcfce7/15803d?text=AC" class="w-8 h-8 rounded-full mr-3" alt="Ana Clara">
+                                        <img src="https://placehold.co/32x32/F6EAE9/703A35?text=AC" class="w-8 h-8 rounded-full mr-3" alt="Ana Clara">
                                         <span class="font-medium text-gray-800">Ana Clara</span>
                                     </div>
                                     <span class="text-xs text-gray-500">sábado, 18/10</span>
@@ -279,64 +330,12 @@
                                 </div>
                                 <!-- Input de Comentário -->
                                 <div class="bg-red-50 p-3 flex items-center space-x-2 border-t border-red-200">
-                                    <img src="https://placehold.co/32x32/10b981/065f46?text=DR" class="w-8 h-8 rounded-full" alt="Doutor(a)">
+                                    <img src="https://placehold.co/32x32/A2574F/F6EAE9?text=DR" class="w-8 h-8 rounded-full" alt="Doutor(a)">
                                     <input type="text" placeholder="Adicionar um comentário..." class="flex-1 w-full bg-gray-100 border border-gray-200 rounded-full text-sm px-4 py-1.5 focus:ring-2 focus:ring-primary focus:border-primary">
                                     <button class="text-primary hover:text-primary-dark text-sm font-medium pl-2">Enviar</button>
                                 </div>
                             </div>
                         </div>
-
--                       <!-- Coluna Lateral (Informações) -->
--                       <div class="lg:col-span-1 space-y-6">
--                           <!-- Próximas Consultas -->
--                           <div class="bg-white p-6 rounded-lg shadow-md">
--                               <h3 class="text-lg font-semibold text-gray-800 mb-4">Próximas Consultas</h3>
--                               <div class="space-y-4">
--                                   <div class="flex items-center">
--                                       <img src="https://placehold.co/40x40/dcfce7/15803d?text=AC" class="w-10 h-10 rounded-full mr-3" alt="Ana Clara">
--                                       <div>
--                                           <p class="font-medium text-gray-700">Ana Clara (-1.2kg)</p>
--                                           <p class="text-sm text-gray-500">15:00 - Acompanhamento</p>
--                                       </div>
--                                       <span class="ml-auto text-sm font-semibold text-primary">15:00</span>
--                                   </div>
--                                   <div class="flex items-center">
--                                       <img src="https://placehold.co/40x40/ecfdf5/065f46?text=BL" class="w-10 h-10 rounded-full mr-3" alt="Beatriz Lima">
--                                       <div>
--                                           <p class="font-medium text-gray-700">Beatriz Lima (+0.5kg)</p>
--                                           <p class="text-sm text-gray-500">15:30 - Acompanhamento</p>
--                                       </div>
--                                       <span class="ml-auto text-sm font-semibold text-gray-700">15:30</span>
--                                   </div>
--                                   <div class="flex items-center">
--                                       <img src="https://placehold.co/40x40/fee2e2/b91c1c?text=CS" class="w-10 h-10 rounded-full mr-3" alt="Carla Souza">
--                                       <div>
--                                           <p class="font-medium text-gray-700">Carla Souza (Nova)</p>
--                                           <p class="text-sm text-gray-500">16:00 - Primeira Consulta</p>
--                                       </div>
--                                       <span class="ml-auto text-sm font-semibold text-gray-700">16:00</span>
--                                   </div>
--                               </div>
--                           </div>
--
--                           <!-- Alertas Recentes -->
--                           <div class="bg-white p-6 rounded-lg shadow-md">
--                               <h3 class="text-lg font-semibold text-gray-800 mb-4">Alertas Recentes</h3>
--                               <ul class="divide-y divide-gray-200">
--                                   <li class="py-3 flex items-center">
--                                       <i data-lucide="alert-circle" class="w-5 h-5 text-red-500 mr-3"></i>
--                                       <p class="text-sm"><b class="font-medium">Beatriz Lima</b> registrou ganho de peso: <b>+0.5 kg</b></p>
--                                       <span class="text-xs text-gray-500 ml-auto">Há 1h</span>
--                                   </li>
--                                    <li class="py-3 flex items-center">
--                                       <i data-lucide="alert-triangle" class="w-5 h-5 text-yellow-500 mr-3"></i>
--                                       <p class="text-sm"><b class="font-medium">Ana Clara</b> marcou uma refeição como "Exceção".</p>
--                                       <span class="text-xs text-gray-500 ml-auto">Há 2d</span>
--                                   </li>
--                               </ul>
--                           </div>
--
--                       </div>
                     </div>
                 </div>
 
@@ -356,10 +355,10 @@
                         <div class="bg-white p-5 rounded-lg shadow-md flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-500">Pacientes Ativos</p>
-                                <p class="text-3xl font-bold text-green-600">84</p>
+                                <p class="text-3xl font-bold text-primary-dark">84</p>
                             </div>
-                            <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                                <i data-lucide="users" class="w-6 h-6 text-green-600"></i>
+                            <div class="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center">
+                                <i data-lucide="users" class="w-6 h-6 text-primary-dark"></i>
                             </div>
                         </div>
                         <div class="bg-white p-5 rounded-lg shadow-md flex items-center justify-between">
@@ -389,7 +388,7 @@
                             <h3 class="text-lg font-semibold text-gray-800 mb-4">Próximas Consultas</h3>
                             <div class="space-y-4">
                                 <div class="flex items-center">
-                                    <img src="https://placehold.co/40x40/dcfce7/15803d?text=AC" class="w-10 h-10 rounded-full mr-3" alt="Ana Clara">
+                                    <img src="https://placehold.co/40x40/F6EAE9/703A35?text=AC" class="w-10 h-10 rounded-full mr-3" alt="Ana Clara">
                                     <div>
                                         <p class="font-medium text-gray-700">Ana Clara (-1.2kg)</p>
                                         <p class="text-sm text-gray-500">15:00 - Acompanhamento</p>
@@ -397,7 +396,7 @@
                                     <span class="ml-auto text-sm font-semibold text-primary">15:00</span>
                                 </div>
                                 <div class="flex items-center">
-                                    <img src="https://placehold.co/40x40/ecfdf5/065f46?text=BL" class="w-10 h-10 rounded-full mr-3" alt="Beatriz Lima">
+                                    <img src="https://placehold.co/40x40/F6EAE9/703A35?text=BL" class="w-10 h-10 rounded-full mr-3" alt="Beatriz Lima">
                                     <div>
                                         <p class="font-medium text-gray-700">Beatriz Lima (+0.5kg)</p>
                                         <p class="text-sm text-gray-500">15:30 - Acompanhamento</p>
@@ -420,7 +419,7 @@
                             <h3 class="text-lg font-semibold text-gray-800 mb-4">Atividade Recente das Pacientes</h3>
                             <ul class="divide-y divide-gray-200">
                                 <li class="py-3 flex items-center">
-                                    <i data-lucide="scale" class="w-5 h-5 text-green-500 mr-3"></i>
+                                    <i data-lucide="scale" class="w-5 h-5 text-primary-dark mr-3"></i>
                                     <p class="text-sm"><b class="font-medium">Ana Clara</b> registrou novo peso: <b>82.5 kg</b></p>
                                     <span class="text-xs text-gray-500 ml-auto">Há 10 min</span>
                                 </li>
@@ -441,21 +440,110 @@
 
                 <!-- === ABA 3: AGENDA === -->
                 <div id="agenda" class="main-tab fade-in">
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-6">Agenda</h3>
-                        <p class="text-gray-600">Simulação da página de agenda.</p>
-                        <!-- Conteúdo da Agenda (simplificado) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Calendário -->
+                        <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-xl font-semibold text-gray-800">Outubro 2025</h3>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 rounded-full hover:bg-gray-100 text-gray-500">
+                                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                                    </button>
+                                    <button class="p-2 rounded-full hover:bg-gray-100 text-gray-500">
+                                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Grid do Calendário -->
+                            <div class="grid grid-cols-7 gap-1 text-center">
+                                <!-- Dias da semana -->
+                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Dom</div>
+                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Seg</div>
+                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Ter</div>
+                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Qua</div>
+                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Qui</div>
+                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Sex</div>
+                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Sáb</div>
+                                
+                                <!-- Dias (Exemplo estático) -->
+                                <div class="calendar-day text-gray-400 py-2">28</div>
+                                <div class="calendar-day text-gray-400 py-2">29</div>
+                                <div class="calendar-day text-gray-400 py-2">30</div>
+                                <div class="calendar-day py-2 cursor-pointer has-event">1</div>
+                                <div class="calendar-day py-2 cursor-pointer">2</div>
+                                <div class="calendar-day py-2 cursor-pointer">3</div>
+                                <div class="calendar-day py-2 cursor-pointer">4</div>
+                                <div class="calendar-day py-2 cursor-pointer">5</div>
+                                <div class="calendar-day py-2 cursor-pointer has-event">6</div>
+                                <div class="calendar-day py-2 cursor-pointer">7</div>
+                                <div class="calendar-day py-2 cursor-pointer">8</div>
+                                <div class="calendar-day py-2 cursor-pointer has-event">9</div>
+                                <div class="calendar-day py-2 cursor-pointer">10</div>
+                                <div class="calendar-day py-2 cursor-pointer">11</div>
+                                <div class="calendar-day py-2 cursor-pointer">12</div>
+                                <div class="calendar-day py-2 cursor-pointer">13</div>
+                                <div class="calendar-day py-2 cursor-pointer has-event">14</div>
+                                <div class="calendar-day py-2 cursor-pointer">15</div>
+                                <div class="calendar-day py-2 cursor-pointer">16</div>
+                                <div class="calendar-day py-2 cursor-pointer">17</div>
+                                <div class="calendar-day py-2 cursor-pointer">18</div>
+                                <div class="calendar-day py-2 cursor-pointer">19</div>
+                                <div class="calendar-day py-2 cursor-pointer has-event">20</div>
+                                <div class="calendar-day py-2 cursor-pointer">21</div>
+                                <div class="calendar-day py-2 cursor-pointer today selected has-event">22</div>
+                                <div class="calendar-day py-2 cursor-pointer">23</div>
+                                <div class="calendar-day py-2 cursor-pointer">24</div>
+                                <div class="calendar-day py-2 cursor-pointer">25</div>
+                                <div class="calendar-day py-2 cursor-pointer">26</div>
+                                <div class="calendar-day py-2 cursor-pointer has-event">27</div>
+                                <div class="calendar-day py-2 cursor-pointer">28</div>
+                                <div class="calendar-day py-2 cursor-pointer has-event">29</div>
+                                <div class="calendar-day py-2 cursor-pointer">30</div>
+                                <div class="calendar-day py-2 cursor-pointer">31</div>
+                            </div>
+                        </div>
+
+                        <!-- Compromissos do Dia -->
+                        <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Hoje (Quarta, 22/10)</h3>
+                            <div class="space-y-4">
+                                <!-- Compromisso 1 -->
+                                <div class="p-4 rounded-lg border-l-4 border-primary bg-primary-light">
+                                    <p class="font-medium text-primary-darker">Ana Clara</p>
+                                    <p class="text-sm text-gray-700">15:00 - Acompanhamento</p>
+                                    <p class="text-xs text-gray-500 mt-1">Status: Confirmado</p>
+                                </div>
+                                <!-- Compromisso 2 -->
+                                <div class="p-4 rounded-lg border-l-4 border-primary bg-primary-light">
+                                    <p class="font-medium text-primary-darker">Beatriz Lima</p>
+                                    <p class="text-sm text-gray-700">15:30 - Acompanhamento</p>
+                                    <p class="text-xs text-gray-500 mt-1">Status: Confirmado</p>
+                                </div>
+                                <!-- Compromisso 3 -->
+                                <div class="p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50">
+                                    <p class="font-medium text-blue-800">Carla Souza</p>
+                                    <p class="text-sm text-gray-700">16:00 - Primeira Consulta</p>
+                                    <p class="text-xs text-gray-500 mt-1">Status: Agendado</p>
+                                </div>
+                                <!-- Compromisso 4 -->
+                                <div class="p-4 rounded-lg border-l-4 border-gray-400 bg-gray-50">
+                                    <p class="font-medium text-gray-600">Almoço</p>
+                                    <p class="text-sm text-gray-700">12:00 - 13:00</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- === ABA 4: LISTA DE PACIENTES === -->
                 <div id="pacientes" class="main-tab fade-in">
                     <div class="bg-white p-6 rounded-lg shadow-md">
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
                             <h3 class="text-xl font-semibold text-gray-800">Lista de Pacientes (84)</h3>
-                            <div class="flex space-x-2">
-                                <input type="text" placeholder="Buscar paciente..." class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
-                                <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark flex items-center">
+                            <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 w-full md:w-auto">
+                                <input type="text" placeholder="Buscar paciente..." class="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                <button class="w-full md:w-auto bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark flex items-center justify-center">
                                     <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>
                                     Novo Paciente
                                 </button>
@@ -478,12 +566,12 @@
                                     <!-- Paciente 1 -->
                                     <tr class="hover:bg-gray-50">
                                         <td class="p-4 flex items-center">
-                                            <img src="https://placehold.co/32x32/dcfce7/15803d?text=AC" class="w-8 h-8 rounded-full mr-3" alt="Ana Clara">
+                                            <img src="https://placehold.co/32x32/F6EAE9/703A35?text=AC" class="w-8 h-8 rounded-full mr-3" alt="Ana Clara">
                                             <span class="font-medium text-gray-800">Ana Clara</span>
                                         </td>
-                                        <td class="p-4 text-sm text-green-600 font-medium">-1.2 kg</td>
+                                        <td class="p-4 text-sm text-primary-dark font-medium">-1.2 kg</td>
                                         <td class="p-4 text-sm">
-                                            <span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-medium">Alta</span>
+                                            <span class="px-3 py-1 rounded-full bg-primary-light text-primary-darker text-xs font-medium">Alta</span>
                                         </td>
                                         <td class="p-4 text-sm text-gray-700">22/10/2025 (Hoje)</td>
                                         <td class="p-4 text-center">
@@ -495,7 +583,7 @@
                                     <!-- Paciente 2 -->
                                     <tr class="hover:bg-gray-50">
                                         <td class="p-4 flex items-center">
-                                            <img src="https://placehold.co/32x32/ecfdf5/065f46?text=BL" class="w-8 h-8 rounded-full mr-3" alt="Beatriz Lima">
+                                            <img src="https://placehold.co/32x32/F6EAE9/703A35?text=BL" class="w-8 h-8 rounded-full mr-3" alt="Beatriz Lima">
                                             <span class="font-medium text-gray-800">Beatriz Lima</span>
                                         </td>
                                         <td class="p-4 text-sm text-red-600 font-medium">+0.5 kg</td>
@@ -532,7 +620,7 @@
                                             <img src="https://placehold.co/32x32/ede9fe/5b21b6?text=JP" class="w-8 h-8 rounded-full mr-3" alt="Juliana Paiva">
                                             <span class="font-medium text-gray-800">Juliana Paiva</span>
                                         </td>
-                                        <td class="p-4 text-sm text-green-600 font-medium">-2.1 kg</td>
+                                        <td class="p-4 text-sm text-primary-dark font-medium">-2.1 kg</td>
                                         <td class="p-4 text-sm">
                                             <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium">Média</span>
                                         </td>
@@ -563,20 +651,20 @@
 
                     <!-- Abas do Prontuário -->
                     <div class="border-b border-gray-200 mb-6">
-                        <nav class="-mb-px flex space-x-6">
-                            <button data-tab="app-data" class="prontuario-tab-btn py-3 px-1 border-b-2 border-primary text-primary font-medium text-sm">
+                        <nav class="-mb-px flex space-x-6 overflow-x-auto">
+                            <button data-tab="app-data" class="prontuario-tab-btn py-3 px-1 border-b-2 border-primary text-primary font-medium text-sm whitespace-nowrap">
                                 <i data-lucide="smartphone" class="w-4 h-4 mr-2 inline-block"></i>
                                 Dados do App
                             </button>
-                            <button data-tab="resumo" class="prontuario-tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm">
+                            <button data-tab="resumo" class="prontuario-tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm whitespace-nowrap">
                                 <i data-lucide="clipboard-list" class="w-4 h-4 mr-2 inline-block"></i>
                                 Resumo Clínico
                             </button>
-                            <button data-tab="plano" class="prontuario-tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm">
+                            <button data-tab="plano" class="prontuario-tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm whitespace-nowrap">
                                 <i data-lucide="file-text" class="w-4 h-4 mr-2 inline-block"></i>
                                 Plano Alimentar
                             </button>
-                            <button data-tab="exames" class="prontuario-tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm">
+                            <button data-tab="exames" class="prontuario-tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm whitespace-nowrap">
                                 <i data-lucide="flask-conical" class="w-4 h-4 mr-2 inline-block"></i>
                                 Exames
                             </button>
@@ -597,10 +685,10 @@
                                     
                                     <!-- Entrada de Refeição 1 -->
                                     <div class="rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                                        <img src="https://placehold.co/600x400/EBFBE5/34592A?text=Foto+do+Almo%C3%A7o" alt="Foto da refeição" class="w-full h-40 object-cover">
+                                        <img src="https://placehold.co/600x400/F6EAE9/A2574F?text=Foto+do+Almo%C3%A7o" alt="Foto da refeição" class="w-full h-40 object-cover">
                                         <div class="p-4">
                                             <div class="flex justify-between items-center mb-1">
-                                                <span class="font-semibold text-emerald-700">Almoço</span>
+                                                <span class="font-semibold text-primary-dark">Almoço</span>
                                                 <span class="text-xs text-gray-500">01/10/2025</span>
                                             </div>
                                             <p class="text-sm text-gray-700">"Salada completa e frango grelhado. Me senti satisfeita."</p>
@@ -609,10 +697,10 @@
                                     
                                     <!-- Entrada de Refeição 2 -->
                                     <div class="rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                                        <img src="https://placehold.co/600x400/EBFBE5/34592A?text=Foto+do+Jantar" alt="Foto da refeição" class="w-full h-40 object-cover">
+                                        <img src="https://placehold.co/600x400/F6EAE9/A2574F?text=Foto+do+Jantar" alt="Foto da refeição" class="w-full h-40 object-cover">
                                         <div class="p-4">
                                             <div class="flex justify-between items-center mb-1">
-                                                <span class="font-semibold text-emerald-700">Jantar</span>
+                                                <span class="font-semibold text-primary-dark">Jantar</span>
                                                 <span class="text-xs text-gray-500">30/09/2025</span>
                                             </div>
                                             <p class="text-sm text-gray-700">"Sopa de legumes. Fiquei com um pouco de fome depois."</p>
@@ -645,10 +733,10 @@
 
                                     <!-- Entrada de Refeição 5 -->
                                     <div class="rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                                        <img src="https://placehold.co/600x400/EBFBE5/34592A?text=Foto+do+Almo%C3%A7o" alt="Foto da refeição" class="w-full h-40 object-cover">
+                                        <img src="https://placehold.co/600x400/F6EAE9/A2574F?text=Foto+do+Almo%C3%A7o" alt="Foto da refeição" class="w-full h-40 object-cover">
                                         <div class="p-4">
                                             <div class="flex justify-between items-center mb-1">
-                                                <span class="font-semibold text-emerald-700">Almoço</span>
+                                                <span class="font-semibold text-primary-dark">Almoço</span>
                                                 <span class="text-xs text-gray-500">29/09/2025</span>
                                             </div>
                                             <p class="text-sm text-gray-700">"Repeti o de ontem. Salada e frango."</p>
@@ -665,14 +753,14 @@
                                     <!-- Entrada de peso (fake data do app da paciente) -->
                                     <li class="py-3 flex justify-between items-center">
                                         <div class="flex items-center">
-                                            <i data-lucide="scale" class="w-4 h-4 text-green-500 mr-3"></i>
+                                            <i data-lucide="scale" class="w-4 h-4 text-primary mr-3"></i>
                                             <span class="text-sm text-gray-700">01/10/2025</span>
                                         </div>
                                         <span class="font-semibold text-gray-800 text-sm">82.5 kg</span>
                                     </li>
                                     <li class="py-3 flex justify-between items-center">
                                         <div class="flex items-center">
-                                            <i data-lucide="scale" class="w-4 h-4 text-green-500 mr-3"></i>
+                                            <i data-lucide="scale" class="w-4 h-4 text-primary mr-3"></i>
                                             <span class="text-sm text-gray-700">25/09/2025</span>
                                         </div>
                                         <span class="font-semibold text-gray-800 text-sm">83.1 kg</span>
@@ -680,7 +768,7 @@
                                     <!-- Entrada de peso -->
                                     <li class="py-3 flex justify-between items-center">
                                         <div class="flex items-center">
-                                            <i data-lucide="scale" class="w-4 h-4 text-green-500 mr-3"></i>
+                                            <i data-lucide="scale" class="w-4 h-4 text-primary mr-3"></i>
                                             <span class="text-sm text-gray-700">18/09/2025</span>
                                         </div>
                                         <span class="font-semibold text-gray-800 text-sm">83.9 kg</span>
@@ -688,7 +776,7 @@
                                     <!-- Entrada de peso -->
                                     <li class="py-3 flex justify-between items-center">
                                         <div class="flex items-center">
-                                            <i data-lucide="scale" class="w-4 h-4 text-green-500 mr-3"></i>
+                                            <i data-lucide="scale" class="w-4 h-4 text-primary mr-3"></i>
                                             <span class="text-sm text-gray-700">11/09/2025 (Início)</span>
                                         </div>
                                         <span class="font-semibold text-gray-800 text-sm">85.0 kg</span>
@@ -745,10 +833,98 @@
                 
                 <!-- === ABA 6: CONFIGURAÇÕES === -->
                 <div id="config" class="main-tab fade-in">
-                    <div class="bg-white p-6 rounded-lg shadow-md max-w-2xl">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Configurações</h3>
-                        <!-- Conteúdo de Configurações (simplificado) -->
-                        <p>Simulação da página de configurações.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Menu de Configurações -->
+                        <div class="md:col-span-1">
+                            <div class="bg-white p-4 rounded-lg shadow-md">
+                                <nav class="space-y-1">
+                                    <button class="w-full text-left flex items-center px-4 py-2 rounded-lg bg-primary-light text-primary-dark font-medium">
+                                        <i data-lucide="user" class="w-4 h-4 mr-3"></i>
+                                        Perfil
+                                    </button>
+                                    <button class="w-full text-left flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-800">
+                                        <i data-lucide="shield" class="w-4 h-4 mr-3"></i>
+                                        Segurança
+                                    </button>
+                                    <button class="w-full text-left flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-800">
+                                        <i data-lucide="bell" class="w-4 h-4 mr-3"></i>
+                                        Notificações
+                                    </button>
+                                    <button class="w-full text-left flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-800">
+                                        <i data-lucide="layout-template" class="w-4 h-4 mr-3"></i>
+                                        Integrações
+                                    </button>
+                                </nav>
+                            </div>
+                        </div>
+
+                        <!-- Conteúdo das Configurações -->
+                        <div class="md:col-span-2">
+                            <div class="bg-white p-6 rounded-lg shadow-md">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-6">Meu Perfil</h3>
+                                
+                                <!-- Formulário de Perfil -->
+                                <form class="space-y-4">
+                                    <!-- Foto de Perfil -->
+                                    <div class="flex items-center space-x-4">
+                                        <img src="https://placehold.co/64x64/A2574F/F6EAE9?text=DR" alt="Foto do Profissional" class="w-16 h-16 rounded-full border-2 border-primary-light">
+                                        <div>
+                                            <button type="button" class="text-sm font-medium text-primary hover:text-primary-dark">Mudar foto</button>
+                                            <p class="text-xs text-gray-500 mt-1">PNG ou JPG, máx 2MB.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Nome Completo -->
+                                    <div>
+                                        <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                                        <input type="text" id="nome" value="Dr. Jean Carlos" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div>
+                                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                        <input type="email" id="email" value="dr.jean.carlos@meuemail.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 text-gray-500" disabled>
+                                    </div>
+
+                                    <!-- CRN -->
+                                    <div>
+                                        <label for="crn" class="block text-sm font-medium text-gray-700 mb-1">CRN</label>
+                                        <input type="text" id="crn" value="CRN-3 12345" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                    
+                                    <!-- Botão Salvar -->
+                                    <div class="pt-2 text-right">
+                                        <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors">
+                                            Salvar Alterações
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Alterar Senha (Exemplo em outra aba de config) -->
+                            <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-6">Alterar Senha</h3>
+                                <form class="space-y-4">
+                                    <div>
+                                        <label for="senha-atual" class="block text-sm font-medium text-gray-700 mb-1">Senha Atual</label>
+                                        <input type="password" id="senha-atual" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                    <div>
+                                        <label for="nova-senha" class="block text-sm font-medium text-gray-700 mb-1">Nova Senha</label>
+                                        <input type="password" id="nova-senha" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                    <div>
+                                        <label for="confirmar-senha" class="block text-sm font-medium text-gray-700 mb-1">Confirmar Nova Senha</label>
+                                        <input type="password" id="confirmar-senha" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                    </div>
+                                    <div class="pt-2 text-right">
+                                        <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors">
+                                            Atualizar Senha
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -765,6 +941,24 @@
             const navButtons = document.querySelectorAll('.nav-button');
             const mainTabs = document.querySelectorAll('.main-tab');
             const pageTitle = document.getElementById('page-title');
+
+            // --- LÓGICA DO MENU MOBILE ---
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+            function toggleSidebar() {
+                if (sidebar && sidebarOverlay) {
+                    sidebar.classList.toggle('-translate-x-full');
+                    sidebarOverlay.classList.toggle('hidden');
+                }
+            }
+
+            if (menuToggle && sidebar && sidebarOverlay) {
+                menuToggle.addEventListener('click', toggleSidebar);
+                sidebarOverlay.addEventListener('click', toggleSidebar);
+            }
+
             
             // --- NAVEGAÇÃO PRINCIPAL (ABAS LATERAIS) ---
             function showMainTab(tabId) {
@@ -783,6 +977,7 @@
                 let title = tabId.charAt(0).toUpperCase() + tabId.slice(1);
                 if (tabId === 'prontuario') {
                     // O título do prontuário é tratado de forma especial
+                    // O nome é definido ao clicar no paciente
                     return; 
                 }
                 if (tabId === 'config') {
@@ -806,6 +1001,11 @@
                         btn.classList.add('hover:bg-primary-dark', 'hover:text-white');
                     }
                 });
+
+                // Esconder sidebar no mobile ao clicar em um item
+                if (window.innerWidth < 1024) { // 1024px = lg
+                    toggleSidebar();
+                }
             }
 
             // Adiciona evento de clique aos botões da barra lateral
@@ -825,7 +1025,12 @@
                     const patientName = button.dataset.patient;
                     
                     // Atualiza o nome no prontuário
-                    prontuarioNome.textContent = `Prontuário: ${patientName}`;
+                    if(prontuarioNome) {
+                        prontuarioNome.textContent = `Prontuário: ${patientName}`;
+                    }
+                    if(pageTitle) {
+                        pageTitle.textContent = `Prontuário: ${patientName}`;
+                    }
                     
                     // (Em um app real, aqui você carregaria os dados do paciente)
                     showMainTab('prontuario');
@@ -877,7 +1082,7 @@
                 });
             });
 
-            // Estado inicial (Mostra o Feed)
+            // Estado inicial (Mostra o Dashboard)
             showMainTab('dashboard');
         });
     </script>
