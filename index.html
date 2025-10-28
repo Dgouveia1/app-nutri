@@ -1,17 +1,31 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class=""> <!-- Classe 'dark' será adicionada aqui pelo JS -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Progresso - Por Jean Carlos </title>
+    <title>MetaCheck+</title>
     <!-- Tailwind CSS CDN -->
+    <script>
+        // Configuração do Tailwind para habilitar o darkMode: 'class'
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        // Adiciona a fonte Pacifico para ser usada com o Tailwind
+                        'pacifico': ['Pacifico', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Fonte estilo Instagram Logo -->
+    <!-- Fonte estilo Instagram Logo (Mantida para posts e agora para o título) -->
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <style>
         /* Estilos adicionais */
@@ -38,343 +52,659 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: all 0.3s ease;
         }
-        .card:hover {
-            transform: translateY(0); /* Remover hover */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        /* Estilo para o toggle de visibilidade */
+        .visibility-toggle.active {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .visibility-toggle:not(.active) {
+            background-color: #f3f4f6; /* gray-100 */
+            color: #4b5563; /* gray-600 */
+        }
+        /* Estilo para o Sidebar */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        #sidebar-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        /* Estilo para a grade de posts do perfil */
+        .profile-grid-item {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%; /* Força o aspect ratio 1:1 */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-900">
 
-    <!-- Cabeçalho Fixo (Estilo Instagram) -->
-    <header class="fixed top-0 left-0 w-full bg-white border-b border-gray-200 flex items-center justify-between p-4 z-10 h-16">
-        <h1 class="text-2xl font-bold text-gray-800" style="font-family: 'Pacifico', cursive;">Meu Progresso - Por Jean Carlos</h1>
-        <button class_="text-gray-700 hover:text-green-600">
-            <i data-lucide="message-circle" class="w-6 h-6"></i>
-        </button>
+    <!-- Cabeçalho Fixo (Layout do Mockup) -->
+    <header class="fixed top-0 left-0 w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between p-4 z-10 h-16">
+        
+        <!-- Botão Hambúrguer (Menu) - Esquerda -->
+        <div class="w-1/6"> <!-- Container para alinhar -->
+            <button id="menu-toggle" class="text-gray-700 dark:text-gray-300 hover:text-green-600">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <!-- Título Central -->
+        <div class="flex-1 text-center">
+            <!-- Título com a fonte 'Pacifico' usando classe Tailwind -->
+            <h1 class="text-2xl dark:text-white font-pacifico">MetaCheck+</h1>
+        </div>
+        
+        <!-- Botão de Notificações (Coração) - Direita -->
+        <div class="w-1/6 flex justify-end"> <!-- Container para alinhar -->
+            <button id="notifications-toggle" data-tab="notificacoes" class="nav-button text-gray-700 dark:text-gray-300 hover:text-red-500 relative">
+                <i data-lucide="heart" class="w-6 h-6"></i>
+                <!-- Ponto de notificação -->
+                <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+            </button>
+        </div>
     </header>
+
+    <!-- Menu Lateral (Sidebar - Novo) -->
+    <aside id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-white dark:bg-gray-800 shadow-lg z-40 transform -translate-x-full flex flex-col">
+        <!-- Flex container for nav and theme toggle -->
+        <div class="flex-1 flex flex-col justify-between">
+            <!-- Links de Navegação (Topo) -->
+            <div>
+                <!-- Cabeçalho do Menu -->
+                <div class="h-16 flex items-center p-4 border-b border-gray-200 dark:border-gray-700">
+                    <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                    <span class="font-semibold text-sm dark:text-white">ana_paula</span>
+                </div>
+                <!-- Links de Navegação -->
+                <nav class="p-4 space-y-2">
+                    <button data-tab="inicio" class="nav-button w-full flex items-center p-3 rounded-lg text-base text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/50 font-medium">
+                        <i data-lucide="home" class="w-5 h-5 mr-3"></i>
+                        Início
+                    </button>
+                    <button data-tab="peso" class="nav-button w-full flex items-center p-3 rounded-lg text-base text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium">
+                        <i data-lucide="scale" class="w-5 h-5 mr-3"></i>
+                        Peso
+                    </button>
+                    <button data-tab="metas" class="nav-button w-full flex items-center p-3 rounded-lg text-base text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium">
+                        <i data-lucide="flag" class="w-5 h-5 mr-3"></i>
+                        Metas
+                    </button>
+                    <button data-tab="perfil" class="nav-button w-full flex items-center p-3 rounded-lg text-base text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium">
+                        <i data-lucide="user" class="w-5 h-5 mr-3"></i>
+                        Perfil
+                    </button>
+                </nav>
+            </div>
+            
+            <!-- Botão de Tema (Fundo) -->
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+                <button id="theme-toggle" class="w-full flex items-center p-3 rounded-lg text-base text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium">
+                    <!-- O ícone será 'moon' ou 'sun' -->
+                    <i data-lucide="moon" class="w-5 h-5 mr-3"></i>
+                    <span>Modo Escuro</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+    <!-- Overlay para fechar o menu -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+
 
     <div id="app" class="flex flex-col min-h-screen">
         <!-- Conteúdo Principal que será trocado -->
-        <main class="flex-1 overflow-y-auto pt-16 pb-16"> <!-- Padding para header/footer fixos -->
+        <!-- Padding-bottom aumentado para dar espaço ao botão flutuante -->
+        <main class="flex-1 overflow-y-auto pt-16 pb-24"> 
             
             <!-- ABA INÍCIO (AGORA O FEED) -->
             <div id="inicio" class="content-tab">
                 <!-- Feed de Refeições -->
                 <div id="feed-container" class="space-y-0">
-                    <!-- Post 1 (Exemplo Novo) -->
-                    <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="post-1">
+                    
+                    <!-- Post 1 (TEXTO - Juliana) - NOVO -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-jp2" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/FEF3C7/9A3412?text=JP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">juliana_p</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Conteúdo (Texto) -->
+                        <div class="p-4 pt-0">
+                            <p class="text-gray-800 dark:text-gray-200 text-base"><b>[Meta Atingida!]</b> 🎉 Consegui beber 2.5L de água hoje! Pequena vitória.</p>
+                        </div>
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3 pt-0">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">terça-feira, 21 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver 1 comentário</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                             <div class="comment-list space-y-1">
+                                 <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">ana_paula</span> Parabéns!! 🥳</p>
+                                </div>
+                             </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post (MÉDICO - Dica) - NOVO -->
+                    <div class="w-full bg-green-50 dark:bg-green-900/30 border-b border-green-200 dark:border-green-800 post-container" data-post-id="post-med-1" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=M" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil Médico">
+                            <span class="font-semibold text-sm dark:text-white">medico_jean</span>
+                            <span class="ml-2 px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-medium">Médico</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Conteúdo (Texto) -->
+                        <div class="p-4 pt-0">
+                            <p class="text-gray-800 dark:text-gray-200 text-base"><b>[Dica do Dia]</b> 💧 Não se esqueçam da hidratação! Muitas vezes, nosso cérebro confunde sede com fome. Antes de beliscar, tente beber um copo de água e espere 15 minutos. #FicaADica</p>
+                        </div>
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3 pt-0">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">terça-feira, 21 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-green-900/30 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post (ana_paula - Evolução) - NOVO -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-ap-evo1" data-visibility="public">
                         <!-- Cabeçalho do Post -->
                         <div class="flex items-center p-3">
                             <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
-                            <span class="font-semibold text-sm">ana_paula</span>
+                            <span class="font-semibold text-sm dark:text-white">ana_paula</span>
+                            <i data-lucide="globe" class="w-3 h-3 text-gray-400 ml-2" title="Público"></i>
                             <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
                         </div>
                         <!-- Imagem do Post -->
                         <img 
-                            src="https://images.unsplash.com/photo-1525351484163-7529414344d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            src="https://images.unsplash.com/photo-1579362484052-18016f243236?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de uma pessoa se pesando na balança" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Evolu%C3%A7%C3%A3o';"
+                        >
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">ana_paula</span> <b>[Evolução]</b> Pessoal, -2kg na balança essa semana! Foco total na meta. 💪</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">segunda-feira, 20 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver 2 comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">medico_jean</span> <span class="text-blue-600 dark:text-blue-400 font-medium">[Médico]</span> Parabéns, Ana! Resultado incrível do seu esforço! 🚀</p>
+                                </div>
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">juliana_p</span> Uau! Que inspiração! 🤩</p>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post 2 (ana_paula - Público) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-1" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ana_paula</span>
+                            <!-- Ícone de Visibilidade (Público) -->
+                            <i data-lucide="globe" class="w-3 h-3 text-gray-400 ml-2" title="Público"></i>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1525351484163-7529414344d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%D&auto=format&fit=crop&w=800&q=80" 
                             alt="Foto de um café da manhã com ovos e abacate" 
                             class="w-full h-auto max-h-[70vh] object-cover"
                             onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Caf%C3%A9';"
                         >
-                        <!-- Ações do Post (Simulado) -->
-                        <div class="flex items-center space-x-4 p-3">
-                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
-                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
-                        </div>
-                        <!-- Legenda do Post -->
-                        <div class="px-3 pb-2 text-sm"> <!-- Reduzido pb-4 para pb-2 -->
-                            <p><span class="font-semibold">ana_paula</span> <b>[Café da Manhã]</b> Começando o dia bem! 🥑 Ovos e abacate.</p>
-                            <span class="text-xs text-gray-400 uppercase mt-1 block">segunda-feira, 20 de outubro de 2025</span>
-                        </div>
-                        <!-- Seção de Comentários -->
-                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
-                        <div class="comment-section hidden px-3 pb-2">
-                            <div class="comment-list space-y-1">
-                                <!-- Comentário FAKE da Nutri -->
-                                <div class="text-sm comment-item">
-                                    <p><span class="font-semibold">nutri_jean</span> <span class="text-blue-600 font-medium">[Nutri]</span> Que ótimo começo de dia, Ana! 👏</p>
-                                </div>
-                                <!-- Comentários do storage vão aqui -->
-                            </div>
-                        </div>
-                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
-                    </div>
-                    
-                    <!-- Post 2 (Exemplo Novo) -->
-                    <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="post-2">
-                        <!-- Cabeçalho do Post -->
-                        <div class="flex items-center p-3">
-                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
-                            <span class="font-semibold text-sm">ana_paula</span>
-                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
-                        </div>
-                        <!-- Imagem do Post -->
-                        <img 
-                            src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                            alt="Foto de um almoço com salmão e salada" 
-                            class="w-full h-auto max-h-[70vh] object-cover"
-                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Almo%C3%A7o';"
-                        >
-                        <!-- Ações do Post (Simulado) -->
+                        <!-- Ações do Post -->
                         <div class="flex items-center space-x-4 p-3">
                             <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
                             <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
                         </div>
                         <!-- Legenda do Post -->
                         <div class="px-3 pb-2 text-sm">
-                            <p><span class="font-semibold">ana_paula</span> <b>[Almoço]</b> Almoço de hoje focado na meta. Salmão e salada. 🥗</p>
-                            <span class="text-xs text-gray-400 uppercase mt-1 block">domingo, 19 de outubro de 2025</span>
+                            <p><span class="font-semibold dark:text-white">ana_paula</span> <b>[Café da Manhã]</b> Começando o dia bem! 🥑 Ovos e abacate.</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">segunda-feira, 20 de outubro de 2025</span>
                         </div>
                         <!-- Seção de Comentários -->
-                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
                         <div class="comment-section hidden px-3 pb-2">
                             <div class="comment-list space-y-1">
-                                <!-- Comentários do storage vão aqui -->
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">medico_jean</span> <span class="text-blue-600 dark:text-blue-400 font-medium">[Médico]</span> Que ótimo começo de dia, Ana! 👏</p>
+                                </div>
                             </div>
                         </div>
-                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
                     </div>
-
-                    <!-- Post 3 (Exemplo Novo - Exceção) -->
-                    <div class="w-full bg-red-50 border-b border-red-200 post-container" data-post-id="post-3">
+                    
+                    <!-- Post 3 (OUTRO PACIENTE - Juliana - Público) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-jp1" data-visibility="public">
                         <!-- Cabeçalho do Post -->
                         <div class="flex items-center p-3">
-                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
-                            <span class="font-semibold text-sm">ana_paula</span>
-                            <span class="ml-2 px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-xs font-medium">Exceção</span>
+                            <img src="https://placehold.co/32x32/FEF3C7/9A3412?text=JP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">juliana_p</span>
+                            <!-- Sem ícone de visibilidade (não é nosso post) -->
                             <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
                         </div>
                         <!-- Imagem do Post -->
                         <img 
-                            src="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            src="https://images.unsplash.com/photo-1490645935967-10de6ba1a033?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de um almoço com salmão e vegetais" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Almo%C3%A7o';"
+                        >
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">juliana_p</span> <b>[Almoço]</b> Foco! 🥗</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">segunda-feira, 20 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                 <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">ricardo_m</span> Que prato bonito!</p>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post (MÉDICO - Receita) - NOVO -->
+                    <div class="w-full bg-green-50 dark:bg-green-900/30 border-b border-green-200 dark:border-green-800 post-container" data-post-id="post-med-2" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=M" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil Médico">
+                            <span class="font-semibold text-sm dark:text-white">medico_jean</span>
+                            <span class="ml-2 px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-medium">Médico</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1563738793012-f0c1f0c23a0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de mousse de abacate com cacau" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Receita';"
+                        >
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">medico_jean</span> <b>[Receita Rápida]</b> Vontade de doce? 🍫 Mousse de Abacate! <br>
+                            - 1/2 abacate maduro <br>
+                            - 1 col. sopa de cacau 100% <br>
+                            - Adoçante a gosto (stevia/xilitol) <br>
+                            Bate tudo no mixer e leve à geladeira. Fica uma delícia!</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">domingo, 19 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-green-900/30 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+                    
+                    <!-- Post 4 (ana_paula - Privado / Exceção) -->
+                    <div class="w-full bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-800 post-container" data-post-id="post-3" data-visibility="private">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ana_paula</span>
+                            <!-- Ícone de Visibilidade (Privado) -->
+                            <i data-lucide="lock" class="w-3 h-3 text-gray-500 dark:text-gray-400 ml-2" title="Privado (só você e o médico podem ver)"></i>
+                            <span class="ml-2 px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 text-xs font-medium">Exceção</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%D&auto=format&fit=crop&w=800&q=80" 
                             alt="Foto de um pedaço de bolo" 
                             class="w-full h-auto max-h-[70vh] object-cover"
                             onerror="this.onerror=null;this.src='https://placehold.co/600x400/FEE2E2/9B2C2C?text=Foto+de+Bolo';"
                         >
-                        <!-- Ações do Post (Simulado) -->
+                        <!-- Ações do Post -->
                         <div class="flex items-center space-x-4 p-3">
                             <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
                             <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
                         </div>
                         <!-- Legenda do Post -->
                         <div class="px-3 pb-2 text-sm">
-                            <p><span class="font-semibold">ana_paula</span> <b>[Lanche]</b> Hoje teve exceção... 🙈 Bolo de aniversário. Mas amanhã volto 100%!</p>
-                            <span class="text-xs text-gray-400 uppercase mt-1 block">sábado, 18 de outubro de 2025</span>
+                            <p><span class="font-semibold dark:text-white">ana_paula</span> <b>[Lanche]</b> Hoje teve exceção... 🙈 Bolo de aniversário. Mas amanhã volto 100%!</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">sábado, 18 de outubro de 2025</span>
                         </div>
                         <!-- Seção de Comentários -->
-                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
                         <div class="comment-section hidden px-3 pb-2">
                             <div class="comment-list space-y-1">
-                                <!-- Comentário FAKE da Nutri -->
                                 <div class="text-sm comment-item">
-                                    <p><span class="font-semibold">nutri_jean</span> <span class="text-blue-600 font-medium">[Nutri]</span> Acontece, Ana! O importante é o equilíbrio e voltar ao foco amanhã. Aproveite seu momento! 😉</p>
+                                    <p><span class="font-semibold dark:text-white">medico_jean</span> <span class="text-blue-600 dark:text-blue-400 font-medium">[Médico]</span> Acontece, Ana! O importante é o equilíbrio e voltar ao foco amanhã. Aproveite seu momento! 😉</p>
                                 </div>
-                                <!-- Comentários do storage vão aqui -->
                             </div>
                         </div>
-                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-red-50 dark:bg-red-900/30 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
                     </div>
-                    
-                    <!-- Post 4 (Exemplo Novo) -->
-                    <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="post-4">
+
+                    <!-- Post (Ricardo - Dúvida) - NOVO -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-rm3" data-visibility="public">
                         <!-- Cabeçalho do Post -->
                         <div class="flex items-center p-3">
-                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
-                            <span class="font-semibold text-sm">ana_paula</span>
+                            <img src="https://placehold.co/32x32/E0E7FF/1E3A8A?text=RM" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ricardo_m</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Conteúdo (Texto) -->
+                        <div class="p-4 pt-0">
+                            <p class="text-gray-800 dark:text-gray-200 text-base"><b>[Dúvida]</b> Pessoal, como vocês lidam com a fome da tarde? Sinto muita vontade de comer pão/bolo umas 16h. Alguma sugestão de lanche que "engana" bem?</p>
+                        </div>
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3 pt-0">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">sábado, 18 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver 1 comentário</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                             <div class="comment-list space-y-1">
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">juliana_p</span> Iogurte com aveia tem me ajudado muito!</p>
+                                </div>
+                             </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post (Juliana - Lanche) - NOVO -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-jp3" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/FEF3C7/9A3412?text=JP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">juliana_p</span>
                             <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
                         </div>
                         <!-- Imagem do Post -->
                         <img 
-                            src="https://images.unsplash.com/photo-1473093226795-af9932fe5856?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            src="https://images.unsplash.com/photo-1505576391880-b3f9d713dc4f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de um lanche com pão integral e sementes" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Lanche';"
+                        >
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">juliana_p</span> <b>[Lanche da Tarde]</b> Meu pãozinho low-carb que o Dr. ensinou! Salvando meus lanches.</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">sábado, 18 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+                    
+                    <!-- Post 5 (TEXTO - Ricardo) - NOVO -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-rm2" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/E0E7FF/1E3A8A?text=RM" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ricardo_m</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Conteúdo (Texto) -->
+                        <div class="p-4 pt-0">
+                            <p class="text-gray-800 dark:text-gray-200 text-base">Pessoal, só para registrar, hoje o dia foi corrido e não consegui seguir 100%. Pedi um almoço que parecia saudável, mas veio cheio de molho. Fica o aprendizado.</p>
+                        </div>
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3 pt-0">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">sexta-feira, 17 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post 6 (ana_paula - Público) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-4" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ana_paula</span>
+                            <i data-lucide="globe" class="w-3 h-3 text-gray-400 ml-2" title="Público"></i>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1473093226795-af9932fe5856?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%D&auto=format&fit=crop&w=800&q=80" 
                             alt="Foto de um jantar com macarrão de abobrinha" 
                             class="w-full h-auto max-h-[70vh] object-cover"
                             onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Jantar';"
                         >
-                        <!-- Ações do Post (Simulado) -->
+                        <!-- Ações e Legenda -->
                         <div class="flex items-center space-x-4 p-3">
                             <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
                             <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
                         </div>
-                        <!-- Legenda do Post -->
                         <div class="px-3 pb-2 text-sm">
-                            <p><span class="font-semibold">ana_paula</span> <b>[Jantar]</b> Jantar mais leve: macarrão de abobrinha. 😋</p>
-                            <span class="text-xs text-gray-400 uppercase mt-1 block">sexta-feira, 17 de outubro de 2025</span>
+                            <p><span class="font-semibold dark:text-white">ana_paula</span> <b>[Jantar]</b> Jantar mais leve: macarrão de abobrinha. 😋</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">sexta-feira, 17 de outubro de 2025</span>
                         </div>
-                        <!-- Seção de Comentários -->
-                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
-                        <div class="comment-section hidden px-3 pb-2">
-                            <div class="comment-list space-y-1">
-                                <!-- Comentários do storage vão aqui -->
-                            </div>
-                        </div>
-                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
                     </div>
 
-                    <!-- Post 5 (Adicionado) -->
-                    <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="post-5">
+                    <!-- Post 7 (OUTRO PACIENTE - Ricardo - Público) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-rm1" data-visibility="public">
                         <!-- Cabeçalho do Post -->
                         <div class="flex items-center p-3">
-                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
-                            <span class="font-semibold text-sm">ana_paula</span>
+                            <img src="https://placehold.co/32x32/E0E7FF/1E3A8A?text=RM" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ricardo_m</span>
                             <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
                         </div>
                         <!-- Imagem do Post -->
                         <img 
-                            src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%D&auto=format&fit=crop&w=800&q=80" 
                             alt="Foto de tigela de iogurte" 
                             class="w-full h-auto max-h-[70vh] object-cover"
                             onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Iogurte';"
                         >
-                        <!-- Ações do Post (Simulado) -->
+                        <!-- Ações e Legenda -->
                         <div class="flex items-center space-x-4 p-3">
                             <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
                             <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
                         </div>
-                        <!-- Legenda do Post -->
                         <div class="px-3 pb-2 text-sm">
-                            <p><span class="font-semibold">ana_paula</span> <b>[Lanche da Tarde]</b> Iogurte com frutas vermelhas. Estava uma delícia!</p>
-                            <span class="text-xs text-gray-400 uppercase mt-1 block">quinta-feira, 16 de outubro de 2025</span>
+                            <p><span class="font-semibold dark:text-white">ricardo_m</span> <b>[Lanche da Tarde]</b> Iogurte com frutas vermelhas. Tentando variar.</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">quinta-feira, 16 de outubro de 2025</span>
                         </div>
-                        <!-- Seção de Comentários -->
-                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
-                        <div class="comment-section hidden px-3 pb-2">
-                            <div class="comment-list space-y-1">
-                                <!-- Comentários do storage vão aqui -->
-                            </div>
-                        </div>
-                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
                     </div>
-
-                    <!-- Post 6 (Adicionado) -->
-                    <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="post-6">
-                        <!-- Cabeçalho do Post -->
-                        <div class="flex items-center p-3">
-                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
-                            <span class="font-semibold text-sm">ana_paula</span>
-                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
-                        </div>
-                        <!-- Imagem do Post -->
-                        <img 
-                            src="https://images.unsplash.com/photo-1606803789360-12b0d0c36192?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                            alt="Foto de panquecas de aveia" 
-                            class="w-full h-auto max-h-[70vh] object-cover"
-                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Panquecas';"
-                        >
-                        <!-- Ações do Post (Simulado) -->
-                        <div class="flex items-center space-x-4 p-3">
-                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
-                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
-                        </div>
-                        <!-- Legenda do Post -->
-                        <div class="px-3 pb-2 text-sm">
-                            <p><span class="font-semibold">ana_paula</span> <b>[Café da Manhã]</b> Panquecas de aveia para variar. 🥞</p>
-                            <span class="text-xs text-gray-400 uppercase mt-1 block">quinta-feira, 16 de outubro de 2025</span>
-                        </div>
-                        <!-- Seção de Comentários -->
-                        <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
-                        <div class="comment-section hidden px-3 pb-2">
-                            <div class="comment-list space-y-1">
-                                <!-- Comentário FAKE da Nutri -->
-                                <div class="text-sm comment-item">
-                                    <p><span class="font-semibold">nutri_jean</span> <span class="text-blue-600 font-medium">[Nutri]</span> Ótima variação! Adicionar uma fonte de proteína junto, como ovos mexidos, pode te dar ainda mais saciedade.</p>
-                                </div>
-                                <!-- Comentários do storage vão aqui -->
-                            </div>
-                        </div>
-                        <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
+                </div>
+            </div>
+            
+            <!-- ABA NOTIFICAÇÕES (NOVA) -->
+            <div id="notificacoes" class="content-tab hidden-tab p-4">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Notificações</h2>
+                <div class="space-y-6">
+                    <!-- Notificação 1 -->
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/40x40/FEF3C7/9A3412?text=JP" class="w-10 h-10 rounded-full mr-3" alt="Foto perfil">
+                        <p class="text-sm flex-1"><span class="font-semibold dark:text-white">juliana_p</span> curtiu sua publicação.</p>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">10m</span>
                     </div>
-
+                    <!-- Notificação 2 -->
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/40x40/A2574F/F6EAE9?text=DR" class="w-10 h-10 rounded-full mr-3" alt="Foto perfil">
+                        <p class="text-sm flex-1"><span class="font-semibold dark:text-white">medico_jean</span> <span class="text-blue-600 dark:text-blue-400 font-medium">[Médico]</span> comentou: "Acontece, Ana! O importante é..."</p>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">1h</span>
+                    </div>
+                    <!-- Notificação 3 -->
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/40x40/E0E7FF/1E3A8A?text=RM" class="w-10 h-10 rounded-full mr-3" alt="Foto perfil">
+                        <p class="text-sm flex-1"><span class="font-semibold dark:text-white">ricardo_m</span> curtiu sua publicação.</p>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">3h</span>
+                    </div>
+                    <!-- Notificação 4 -->
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/40x40/E0E7FF/1E3A8A?text=RM" class="w-10 h-10 rounded-full mr-3" alt="Foto perfil">
+                        <p class="text-sm flex-1"><span class="font-semibold dark:text-white">ricardo_m</span> comentou: "Que prato bonito!"</p>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">3h</span>
+                    </div>
                 </div>
             </div>
 
             <!-- ABA ADICIONAR POST (Antigo Diário) -->
             <div id="add-post" class="content-tab hidden-tab p-4">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Nova Refeição 📸</h2>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Nova Publicação 📸</h2>
                 
-                <div class="card p-4 mb-6 shadow-none border border-gray-200 rounded-lg">
+                <div class="card p-4 mb-6 shadow-none border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800">
                     <!-- Preview da Imagem -->
-                    <img id="foto-preview" class="hidden w-full h-48 object-cover rounded-lg mb-3 border border-gray-200" alt="Preview da refeição">
+                    <img id="foto-preview" class="hidden w-full h-48 object-cover rounded-lg mb-3 border border-gray-200 dark:border-gray-600" alt="Preview da refeição">
 
                     <!-- Input da Foto -->
                     <input type="file" id="diario-foto-input" class="hidden" accept="image/*">
-                    <label for="diario-foto-input" class="w-full cursor-pointer bg-gray-100 hover:bg-gray-200 border border-dashed border-gray-300 text-gray-600 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-center transition-all mb-3">
+                    <label for="diario-foto-input" class="w-full cursor-pointer bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-center transition-all mb-3">
                         <i data-lucide="camera" class="w-4 h-4 mr-2"></i>
                         <span id="foto-label">Adicionar Foto da Refeição</span>
                     </label>
 
                     <!-- Tipo de Refeição -->
-                    <select id="diario-refeicao" class="w-full border rounded-xl p-3 text-sm border-green-200 focus:ring-2 focus:ring-green-300 bg-white mb-3">
+                    <select id="diario-refeicao" class="w-full border rounded-xl p-3 text-sm border-green-200 dark:border-green-700 focus:ring-2 focus:ring-green-300 bg-white dark:bg-gray-700 dark:text-white mb-3">
                         <option>Café da Manhã</option>
                         <option>Almoço</option>
                         <option>Jantar</option>
                         <option>Lanche da Manhã</option>
                         <option>Lanche da Tarde</option>
                         <option>Ceia</option>
+                        <option>Evolução</option> <!-- ADICIONADO -->
                     </select>
 
                     <!-- Anotações -->
                     <textarea
                         id="diario-texto"
-                        placeholder="Como você se sentiu? Alguma observação sobre a refeição? (Ex: comi rápido, me senti inchado...)"
-                        class="w-full p-3 border rounded-xl border-green-200 mb-3 text-sm focus:ring-2 focus:ring-green-300 focus:border-green-300 transition resize-none"
+                        placeholder="Escreva uma legenda..."
+                        class="w-full p-3 border rounded-xl border-green-200 dark:border-green-700 mb-3 text-sm focus:ring-2 focus:ring-green-300 focus:border-green-300 transition resize-none dark:bg-gray-700 dark:text-white"
                         rows="3"
                     ></textarea>
+
+                    <!-- Checkbox de Exceção (NOVO) -->
+                    <div class="flex items-center mb-4">
+                        <input id="diario-excecao" type="checkbox" class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 dark:bg-gray-700 dark:border-gray-600">
+                        <label for="diario-excecao" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">Marcar como Exceção (fora do plano)</label>
+                    </div>
+
+                    <!-- Seletor de Visibilidade (NOVO) -->
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Visibilidade</label>
+                    <div class="flex w-full rounded-lg border border-gray-300 dark:border-gray-600 p-1 bg-gray-100 dark:bg-gray-700 mb-4">
+                        <button data-visibility="public" class="visibility-toggle active flex-1 p-2 rounded-md text-sm font-semibold flex items-center justify-center transition-all duration-200">
+                            <i data-lucide="globe" class="w-4 h-4 mr-2"></i>
+                            Público
+                        </button>
+                        <button data-visibility="private" class="visibility-toggle flex-1 p-2 rounded-md text-sm font-semibold flex items-center justify-center transition-all duration-200" style="color: rgb(75, 85, 99); background-color: rgb(243, 244, 246);">
+                            <i data-lucide="lock" class="w-4 h-4 mr-2"></i>
+                            Privado
+                        </button>
+                    </div>
+                    <input type="hidden" id="post-visibility" value="public">
                     
                     <button id="salvar-diario" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-3 rounded-xl text-sm font-semibold hover:opacity-90 transition-all shadow-md">
                         Publicar
                     </button>
                 </div>
-                
-                <h3 class="text-lg font-semibold text-gray-800 mb-3 hidden">Suas Refeições</h3>
-                <div id="diario-entradas" class="space-y-4 hidden">
-                    <!-- Entradas de exemplo (movidas para o feed) -->
-                </div>
             </div>
 
             <!-- ABA PESO -->
             <div id="peso" class="content-tab hidden-tab p-4">
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Acompanhamento de Peso ⚖️</h2>
-                <p class="text-gray-600 mb-4">Monitore sua evolução de peso durante a jornada.</p>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Acompanhamento de Peso ⚖️</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Monitore sua evolução de peso durante a jornada.</p>
                 
-                <div class="card p-4 mb-6">
+                <div class="card dark:bg-gray-800 dark:border dark:border-gray-700 p-4 mb-6">
                     <div class="flex mb-3">
                         <input
                             id="peso-input"
                             type="number"
                             step="0.1"
                             placeholder="Digite seu peso atual (kg)"
-                            class="flex-1 border rounded-l-xl p-3 text-sm border-green-200 focus:ring-2 focus:ring-green-300"
+                            class="flex-1 border rounded-l-xl p-3 text-sm border-green-200 dark:border-green-700 focus:ring-2 focus:ring-green-300 dark:bg-gray-700 dark:text-white"
                         />
                         <button id="add-peso" class="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 rounded-r-xl text-sm font-bold hover:opacity-90 transition-all">
                             Adicionar
                         </button>
                     </div>
-                    <p class="text-xs text-gray-500 text-center">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
                         Tente se pesar sempre no mesmo horário, de preferência pela manhã.
                     </p>
                 </div>
                 
-                <div class="card p-4">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Histórico de Peso</h3>
+                <div class="card dark:bg-gray-800 dark:border dark:border-gray-700 p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">Histórico de Peso</h3>
                     <ul id="lista-pesos" class="space-y-3">
-                        <li class="flex justify-between items-center p-3 border-b border-gray-100 last:border-0">
+                        <li class="flex justify-between items-center p-3 border-b border-gray-100 dark:border-gray-700 last:border-0">
                             <div class="flex items-center">
                                 <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
                                     <i data-lucide="scale" class="w-4 h-4 text-green-500"></i>
                                 </div>
-                                <span class="text-gray-700">25/09/2025</span>
+                                <span class="text-gray-700 dark:text-gray-300">25/09/2025</span>
                             </div>
-                            <span class="font-semibold text-gray-800">83.1 kg</span>
+                            <span class="font-semibold text-gray-800 dark:text-white">83.1 kg</span>
                         </li>
-                        <li class="flex justify-between items-center p-3 border-b border-gray-100 last:border-0">
+                        <li class="flex justify-between items-center p-3 border-b border-gray-100 dark:border-gray-700 last:border-0">
                             <div class="flex items-center">
                                 <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
                                     <i data-lucide="scale" class="w-4 h-4 text-green-500"></i>
                                 </div>
-                                <span class="text-gray-700">18/09/2025</span>
+                                <span class="text-gray-700 dark:text-gray-300">18/09/2025</span>
                             </div>
-                            <span class="font-semibold text-gray-800">83.9 kg</span>
+                            <span class="font-semibold text-gray-800 dark:text-white">83.9 kg</span>
                         </li>
                     </ul>
                 </div>
@@ -382,140 +712,103 @@
 
             <!-- ABA METAS -->
             <div id="metas" class="content-tab hidden-tab p-4">
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Minhas Metas 🎯</h2>
-                <p class="text-gray-600 mb-4">Acompanhe os objetivos definidos com seu profissional.</p>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Minhas Metas 🎯</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Acompanhe os objetivos definidos com seu profissional.</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="card p-5">
+                    <div class="card dark:bg-gray-800 dark:border dark:border-gray-700 p-5">
                         <div class="flex items-center mb-2">
                             <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3 shrink-0">
                                 <i data-lucide="flag" class="w-5 h-5 text-red-500"></i>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-gray-800">Peso Alvo</h3>
-                                <p class="text-sm text-gray-600">Seu objetivo principal</p>
+                                <h3 class="font-semibold text-gray-800 dark:text-white">Peso Alvo</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Seu objetivo principal</p>
                             </div>
                         </div>
-                        <p class="text-3xl font-bold text-gray-800 text-center my-4">75.0 <span class="text-xl font-normal">kg</span></p>
+                        <p class="text-3xl font-bold text-gray-800 dark:text-white text-center my-4">75.0 <span class="text-xl font-normal">kg</span></p>
                     </div>
 
-                    <div class="card p-5">
+                    <div class="card dark:bg-gray-800 dark:border dark:border-gray-700 p-5">
                         <div class="flex items-center mb-2">
                             <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3 shrink-0">
                                 <i data-lucide="glass-water" class="w-5 h-5 text-blue-500"></i>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-gray-800">Consumo de Água</h3>
-                                <p class="text-sm text-gray-600">Meta diária</t>
+                                <h3 class="font-semibold text-gray-800 dark:text-white">Consumo de Água</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Meta diária</t>
                             </div>
                         </div>
-                        <p class="text-3xl font-bold text-gray-800 text-center my-4">2.5 <span class="text-xl font-normal">Litros</span></p>
-                    </div>
-
-                    <div class="card p-5 col-span-1 md:col-span-2">
-                        <div class="flex items-center mb-2">
-                            <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3 shrink-0">
-                                <i data-lucide="activity" class="w-5 h-5 text-yellow-700"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-800">Atividade Física</h3>
-                                <p class="text-sm text-gray-600">Meta semanal</t>
-                            </div>
-                        </div>
-                        <p class="text-2xl font-bold text-gray-800 text-center my-4">3x <span class="text-xl font-normal">por semana (30 min)</span></p>
+                        <p class="text-3xl font-bold text-gray-800 dark:text-white text-center my-4">2.5 <span class="text-xl font-normal">Litros</span></p>
                     </div>
                 </div>
             </div>
             
-            <!-- ABA PERFIL (Antiga Consultas) -->
-            <div id="perfil" class="content-tab hidden-tab p-4">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Meu Perfil</h2>
+            <!-- ABA PERFIL (REMODELADA ESTILO INSTAGRAM) -->
+            <div id="perfil" class="content-tab hidden-tab">
+                <!-- Seção de Perfil e Stats (Header) -->
+                <div class="p-4">
+                    <div class="flex items-center mb-4">
+                        <img src="https://placehold.co/80x80/EBFBE5/34592A?text=AP" class="w-20 h-20 rounded-full mr-4 border-2 border-gray-200 dark:border-gray-700" alt="Foto de Perfil">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-semibold mb-1 dark:text-white">ana_paula</h3>
+                            <button class="w-full text-sm font-semibold text-gray-700 bg-gray-200 dark:text-gray-200 dark:bg-gray-700 px-4 py-1.5 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">Editar Perfil</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Bio -->
+                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">Em jornada de reeducação alimentar. Foco na meta! 🎯</p>
 
-                <!-- Seção de Perfil -->
-                <div class="flex items-center mb-6">
-                    <img src="https://placehold.co/80x80/EBFBE5/34592A?text=AP" class="w-20 h-20 rounded-full mr-4 border-2 border-gray-200" alt="Foto de Perfil">
-                    <div>
-                        <h3 class="text-xl font-semibold">ana_paula</h3>
-                        <p class="text-gray-600">Em jornada de reeducação alimentar.</p>
-                        <button class="mt-2 text-sm font-semibold text-gray-700 bg-gray-200 px-4 py-1 rounded-lg hover:bg-gray-300">Editar Perfil</button>
-                    </div>
-                </div>
-                
-                <!-- Stats -->
-                <div class="grid grid-cols-3 gap-4 text-center mb-6">
-                    <div>
-                        <p class="text-2xl font-bold">14</p> <!-- Atualizado de 12 para 14 com os novos posts -->
-                        <p class="text-sm text-gray-500">Refeições</p>
-                    </div>
-                    <div>
-                        <p class="text-2xl font-bold">85.0 <span class="text-lg">kg</span></p>
-                        <p class="text-sm text-gray-500">Inicial</p>
-                    </div>
-                    <div>
-                        <p class="text-2xl font-bold">75.0 <span class="text-lg">kg</span></p>
-                        <p class="text-sm text-gray-500">Meta</p>
-                    </div>
-                </div>
-
-                <!-- Próxima Consulta (Movido do Início) -->
-                <div class="card p-5 mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200">
-                    <div class="flex items-start">
-                        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mr-4 shrink-0">
-                            <i data-lucide="calendar" class="text-green-500 w-6 h-6"></i>
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 gap-4 text-center py-2 border-t border-b border-gray-200 dark:border-gray-700">
+                        <div>
+                            <p id="perfil-posts-count" class="text-lg font-bold dark:text-white">0</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Posts</p>
                         </div>
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-800">Próxima Consulta</h3>
-                            <p class="text-gray-700 mt-1"><b>20 de outubro de 2025</b> às <b>15h</b></p>
-                            <p class="text-gray-600 text-sm mt-2">Com <b>Dr(a). [Nome do Profissional]</b></p>
+                            <p class="text-lg font-bold dark:text-white">85.0 <span class="text-sm">kg</span></p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Inicial</p>
+                        </div>
+                        <div>
+                            <p class="text-lg font-bold dark:text-white">75.0 <span class="text-sm">kg</span></p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Meta</p>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Próximos Exames (Movido de Consultas) -->
-                <h3 class="text-lg font-semibold text-gray-800 mb-3">Próximos Exames</h3>
-                <div class="space-y-4">
-                    <div class="card p-4 border border-gray-200 shadow-none">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-semibold text-gray-800">Exames de Sangue</h4>
-                                <p class="text-gray-600 text-sm mt-1">Coletar até 25/10/2025</p>
-                            </div>
-                            <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pendente</span>
-                        </div>
-                    </div>
+
+                <!-- Abas da Grade (Grid/Salvos/Etc) -->
+                <div class="flex justify-around items-center border-b border-gray-200 dark:border-gray-700">
+                    <!-- Aba de Grade (Ativa) -->
+                    <button class="flex-1 flex justify-center py-2 border-b-2 border-gray-800 dark:border-gray-200 text-gray-800 dark:text-gray-200">
+                        <i data-lucide="grid-3x3" class="w-5 h-5"></i>
+                    </button>
+                    <!-- Aba de Salvos (Inativa - exemplo) -->
+                    <button class="flex-1 flex justify-center py-2 text-gray-400 dark:text-gray-600">
+                        <i data-lucide="bookmark" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <!-- Grade de Fotos -->
+                <div id="perfil-grid" class="grid grid-cols-3 gap-0.5">
+                    <!-- As imagens serão preenchidas pelo JS -->
+                    <!-- Exemplo de item (será gerado dinamicamente) -->
+                    <!-- 
+                    <div class="profile-grid-item" style="background-image: url('URL_DA_IMAGEM');"></div>
+                    -->
                 </div>
             </div>
         </main>
 
-        <!-- Barra de Navegação Inferior -->
-        <footer class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 flex justify-around py-3 h-16 items-center">
-            <button data-tab="inicio" class="nav-button flex flex-col items-center text-sm text-green-600 transition-colors w-16">
-                <i data-lucide="home" class="w-6 h-6 mb-1"></i>
-                <!-- <span class="text-xs">Início</span> -->
-            </button>
-            <button data-tab="peso" class="nav-button flex flex-col items-center text-sm text-gray-500 transition-colors w-16">
-                <i data-lucide="scale" class="w-6 h-6 mb-1"></i>
-                <!-- <span class="text-xs">Peso</span> -->
-            </button>
-            <button data-tab="add-post" class="nav-button flex flex-col items-center text-sm text-gray-500 transition-colors w-16">
-                <i data-lucide="plus-square" class="w-6 h-6 mb-1"></i>
-                <!-- <span class="text-xs">Postar</span> -->
-            </button>
-            <button data-tab="metas" class="nav-button flex flex-col items-center text-sm text-gray-500 transition-colors w-16 text-center">
-                <i data-lucide="flag" class="w-6 h-6 mb-1"></i>
-                <!-- <span class="text-xs">Metas</span> -->
-            </button>
-            <button data-tab="perfil" class="nav-button flex flex-col items-center text-sm text-gray-500 transition-colors w-16">
-                <i data-lucide="user" class="w-6 h-6 mb-1"></i>
-                <!-- <span class="text-xs">Perfil</span> -->
-            </button>
-        </footer>
+        <!-- Botão Flutuante de Adicionar Post (Novo) -->
+        <button id="floating-add-btn" data-tab="add-post" class="nav-button fixed bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full flex items-center justify-center shadow-lg z-20 transform transition-transform hover:scale-105">
+            <i data-lucide="plus" class="w-8 h-8"></i>
+        </button>
     </div>
     
     <!-- Modal de Alerta Customizado -->
     <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center card">
-            <p id="modal-message" class="text-gray-700 mb-4"></p>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-sm text-center card">
+            <p id="modal-message" class="text-gray-700 dark:text-gray-200 mb-4"></p>
             <button id="modal-close" class="bg-green-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-600 transition">
                 OK
             </button>
@@ -525,13 +818,84 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Inicializa os ícones da biblioteca Lucide
-            lucide.createIcons();
+            // --- LÓGICA DE TEMA (CLARO/ESCURO) ---
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle ? themeToggle.querySelector('i') : null;
+            const themeText = themeToggle ? themeToggle.querySelector('span') : null;
 
-            const navButtons = document.querySelectorAll('.nav-button');
+            // Função para aplicar o tema (dark/light)
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    if (themeIcon) {
+                        themeIcon.setAttribute('data-lucide', 'sun');
+                        themeText.textContent = 'Modo Claro';
+                    }
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    if (themeIcon) {
+                        themeIcon.setAttribute('data-lucide', 'moon');
+                        themeText.textContent = 'Modo Escuro';
+                    }
+                }
+                // Recriar ícones do Lucide após mudar (importante para o toggle)
+                lucide.createIcons();
+            }
+
+            // Carrega o tema salvo no localStorage ou prefere o do sistema
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let currentTheme;
+            if (savedTheme) {
+                currentTheme = savedTheme;
+            } else {
+                currentTheme = prefersDark ? 'dark' : 'light';
+            }
+            
+            // Aplica o tema ANTES de renderizar os ícones pela primeira vez
+            applyTheme(currentTheme);
+
+            // Event listener para o botão de toggle
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    let newTheme;
+                    if (document.documentElement.classList.contains('dark')) {
+                        newTheme = 'light';
+                    } else {
+                        newTheme = 'dark';
+                    }
+                    localStorage.setItem('theme', newTheme);
+                    applyTheme(newTheme);
+                });
+            }
+
+            // --- Seletores da Nova Navegação ---
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const navButtons = document.querySelectorAll('.nav-button'); // Inclui botões do sidebar, flutuante e de notificações
+            
+            let activeTabId = 'inicio'; // Variável para rastrear a aba ativa
+
             const contentTabs = document.querySelectorAll('.content-tab');
-            const pageTitle = document.getElementById('page-title'); // Referência ao novo título
             const feedContainer = document.getElementById('feed-container');
+
+            // --- LÓGICA DO SIDEBAR (MENU HAMBÚRGUER) ---
+            function toggleSidebar() {
+                sidebar.classList.toggle('-translate-x-full');
+                sidebarOverlay.classList.toggle('hidden');
+                // Recriar ícones no sidebar quando ele abre
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    lucide.createIcons();
+                }
+            }
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', toggleSidebar);
+            }
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', toggleSidebar);
+            }
 
             // --- CARREGAR ESTADO INICIAL (CURTIDAS E COMENTÁRIOS) ---
             function loadLikesAndComments() {
@@ -566,7 +930,6 @@
             }
             
             // --- FUNÇÕES DE MANIPULAÇÃO DO FEED ---
-
             // Lógica de Curtir
             function handleLikeClick(buttonEl) {
                 const post = buttonEl.closest('.post-container');
@@ -636,15 +999,43 @@
             }
 
 
-            // --- LÓGICA DE NAVEGAÇÃO ENTRE ABAS ---
+            // --- LÓGICA DE NAVEGAÇÃO ENTRE ABAS (ATUALIZADA) ---
+            const notificationsToggle = document.getElementById('notifications-toggle');
+            const notificationDot = notificationsToggle ? notificationsToggle.querySelector('span') : null;
+
             navButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const targetTabId = button.dataset.tab;
+
+                    // Lógica de toggle para Notificações
+                    if (targetTabId === 'notificacoes') {
+                        if (activeTabId === 'notificacoes') {
+                            // Se já estiver na aba de notificações, volte ao início
+                            showTab('inicio');
+                            return; // Encerra a execução aqui
+                        } else {
+                            // Se não, apenas esconda o ponto de notificação
+                            if (notificationDot) {
+                                notificationDot.classList.add('hidden');
+                            }
+                        }
+                    }
+
                     showTab(targetTabId);
+
+                    // Se for um botão do sidebar, feche o sidebar
+                    if (button.closest('#sidebar')) {
+                        toggleSidebar();
+                    }
+                    
+                    // Ocultar o ponto de notificação foi movido para a lógica de toggle acima
                 });
             });
 
             function showTab(tabId) {
+                // Se a aba de destino não for válida (ex: null), não faça nada
+                if (!tabId) return;
+
                 contentTabs.forEach(tab => {
                     if (tab.id === tabId) {
                         tab.classList.remove('hidden-tab');
@@ -653,21 +1044,80 @@
                     }
                 });
 
-                navButtons.forEach(btn => {
+                activeTabId = tabId; // Atualiza a aba ativa
+
+                // Atualiza os botões de navegação DENTRO do sidebar
+                const sidebarNavButtons = sidebar.querySelectorAll('.nav-button');
+                sidebarNavButtons.forEach(btn => {
                     if (btn.dataset.tab === tabId) {
-                        btn.classList.add('text-green-600'); // Cor ativa
-                        btn.classList.remove('text-gray-500');
+                        btn.classList.add('text-green-600', 'bg-green-50'); // Cor ativa
+                        btn.classList.remove('text-gray-600', 'hover:bg-gray-100');
                     } else {
-                        btn.classList.add('text-gray-500');
-                        btn.classList.remove('text-green-600');
+                        btn.classList.add('text-gray-600', 'hover:bg-gray-100');
+                        btn.classList.remove('text-green-600', 'bg-green-50');
+                    }
+                });
+                
+                // --- LÓGICA ESPECIAL PARA A ABA PERFIL ---
+                if (tabId === 'perfil') {
+                    lucide.createIcons(); // Garante que ícones do perfil (grid/bookmark) sejam renderizados
+                    populateProfileGrid();
+                }
+
+                // Recria ícones se a aba alvo for 'add-post', 'peso' ou 'notificacoes'
+                if (['add-post', 'peso', 'notificacoes'].includes(tabId)) {
+                    lucide.createIcons();
+                }
+            }
+
+            // --- FUNÇÃO PARA POPULAR A GRADE DO PERFIL ---
+            function populateProfileGrid() {
+                const profileGrid = document.getElementById('perfil-grid');
+                const postsCountEl = document.getElementById('perfil-posts-count');
+                if (!profileGrid || !postsCountEl) return;
+
+                // 1. Limpa a grade e reseta a contagem
+                profileGrid.innerHTML = '';
+                let postCount = 0;
+
+                // 2. Busca todos os posts no feed
+                const allPosts = document.querySelectorAll('#feed-container .post-container');
+
+                allPosts.forEach(post => {
+                    // 3. Verifica se o post é de 'ana_paula'
+                    const usernameEl = post.querySelector('.font-semibold.text-sm');
+                    if (usernameEl && usernameEl.textContent === 'ana_paula') {
+                        
+                        // 4. Verifica se o post tem uma imagem visível
+                        const postImage = post.querySelector('img.object-cover');
+                        if (postImage && postImage.src && !postImage.classList.contains('hidden') && !postImage.src.includes('placehold.co/600x400')) {
+                            postCount++;
+                            
+                            // 5. Cria o item da grade
+                            const gridItem = document.createElement('div');
+                            gridItem.className = 'profile-grid-item';
+                            gridItem.style.backgroundImage = `url(${postImage.src})`;
+                            
+                            // Adiciona ícone se for "Exceção" ou "Privado"
+                            if (post.dataset.visibility === 'private') {
+                                gridItem.innerHTML = '<i data-lucide="lock" class="w-4 h-4 text-white absolute top-1 right-1 bg-black bg-opacity-30 rounded-full p-0.5"></i>';
+                            } else if (post.querySelector('.bg-red-100')) { // Verifica se é exceção
+                                gridItem.innerHTML = '<i data-lucide="alert-triangle" class="w-4 h-4 text-white absolute top-1 right-1 bg-black bg-opacity-30 rounded-full p-0.5"></i>';
+                            }
+
+                            profileGrid.appendChild(gridItem);
+                        } else if (postImage && postImage.classList.contains('hidden') && post.querySelector('.text-base')) {
+                            // Conta posts de "apenas texto"
+                            postCount++;
+                        }
                     }
                 });
 
-                // Atualiza os ícones caso a aba de destino seja 'add-post'
-                // para garantir que o ícone de câmera seja renderizado.
-                if (tabId === 'add-post') {
-                    lucide.createIcons();
-                }
+                // 6. Atualiza a contagem de posts
+                postsCountEl.textContent = postCount;
+                
+                // 7. Renderiza os ícones (lock/alert) adicionados à grade
+                lucide.createIcons();
             }
 
 
@@ -686,16 +1136,21 @@
                 });
             }
             
-            // --- LÓGICA DO DIÁRIO ALIMENTAR ---
+            // --- LÓGICA DO DIÁRIO ALIMENTAR (NOVO POST) ---
             const diarioTexto = document.getElementById('diario-texto');
             const diarioRefeicao = document.getElementById('diario-refeicao');
             const salvarDiarioBtn = document.getElementById('salvar-diario');
-            const feedEntradas = document.getElementById('feed-container'); // MUDOU: Target é o feed
+            const feedEntradas = document.getElementById('feed-container');
             const fotoInput = document.getElementById('diario-foto-input');
             const fotoPreview = document.getElementById('foto-preview');
             const fotoLabel = document.getElementById('foto-label');
+            
+            // Novos seletores para Visibilidade e Exceção
+            const visibilityToggles = document.querySelectorAll('.visibility-toggle');
+            const visibilityInput = document.getElementById('post-visibility');
+            const excecaoCheckbox = document.getElementById('diario-excecao');
 
-            let fotoUrl = null; // Armazena a URL da imagem (base64)
+            let fotoUrl = null; 
 
             // Preview da imagem
             if (fotoInput) {
@@ -707,14 +1162,35 @@
                             fotoUrl = e.target.result;
                             fotoPreview.src = fotoUrl;
                             fotoPreview.classList.remove('hidden');
-                            fotoLabel.textContent = file.name; // Mostra o nome do arquivo
+                            fotoLabel.textContent = file.name;
                         };
                         reader.readAsDataURL(file);
                     }
                 });
             }
+            
+            // Lógica do Toggle de Visibilidade
+            if (visibilityToggles.length > 0) {
+                visibilityToggles.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault(); 
+                        const newVisibility = button.dataset.visibility;
+                        visibilityInput.value = newVisibility;
 
-            // Salvar diário
+                        // Update styles
+                        visibilityToggles.forEach(btn => {
+                            if (btn.dataset.visibility === newVisibility) {
+                                btn.classList.add('active');
+                            } else {
+                                btn.classList.remove('active');
+                            }
+                        });
+                    });
+                });
+            }
+
+
+            // Salvar diário (Publicar)
             if (salvarDiarioBtn) {
                 salvarDiarioBtn.addEventListener('click', () => {
                     const texto = diarioTexto.value.trim();
@@ -723,38 +1199,66 @@
                     const dataFormatada = data.toLocaleDateString('pt-BR', { 
                         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
                     });
-                    const postId = `post-${Date.now()}`; // ID Único para o novo post
+                    const postId = `post-${Date.now()}`;
+                    
+                    // Pegar valores de visibilidade e exceção
+                    const visibility = visibilityInput.value; // 'public' or 'private'
+                    const isExcecao = excecaoCheckbox.checked;
 
-                    // ***** CORREÇÃO INICIA AQUI *****
-                    // O HTML gerado estava incorreto. Esta é a versão corrigida,
-                    // seguindo a estrutura dos posts de exemplo.
+                    // Definir ícone de visibilidade
+                    const visibilityIcon = visibility === 'private' ? 
+                        '<i data-lucide="lock" class="w-3 h-3 text-gray-500 ml-2" title="Privado"></i>' : 
+                        '<i data-lucide="globe" class="w-3 h-3 text-gray-400 ml-2" title="Público"></i>';
 
+                    // Definir tag de exceção
+                    const excecaoTag = isExcecao ? 
+                        '<span class="ml-2 px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-xs font-medium">Exceção</span>' : '';
+                    
+                    // Definir classe de fundo (para exceção)
+                    const postBgClass = isExcecao ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200';
+                    
                     const placeholderImg = 'https://placehold.co/600x400/EBFBE5/34592A?text=Sem+Foto';
 
                     const novaEntradaHTML = `
-                        <div class="w-full bg-white border-b border-gray-200 post-container" data-post-id="${postId}">
+                        <div class="w-full border-b ${postBgClass} post-container" data-post-id="${postId}" data-visibility="${visibility}">
                             <!-- Cabeçalho do Post -->
                             <div class="flex items-center p-3">
                                 <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
                                 <span class="font-semibold text-sm">ana_paula</span>
+                                ${visibilityIcon}
+                                ${excecaoTag}
+                                <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
                             </div>
                             <!-- Imagem do Post -->
                             <img 
                                 src="${fotoUrl || placeholderImg}" 
                                 alt="Foto da refeição" 
-                                class="w-full h-auto max-h-[70vh] object-cover"
+                                class="w-full h-auto max-h-[70vh] object-cover ${!fotoUrl ? 'hidden' : ''}"
                                 onerror="this.onerror=null;this.src='${placeholderImg}';"
                             >
+                            <!-- Conteúdo (Texto) - Exibido se NÃO houver foto, ou se houver texto -->
+                            ${(texto && !fotoUrl) ? `
+                            <div class="p-4 pt-0">
+                                <p class="text-gray-800 text-base">${texto.replace(/\n/g, '<br>')}</p>
+                            </div>
+                            ` : ''}
+
                             <!-- Ações do Post (Simulado) -->
-                            <div class="flex items-center space-x-4 p-3">
+                            <div class="flex items-center space-x-4 p-3 ${ (texto && !fotoUrl) ? 'pt-0' : '' }">
                                 <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
                                 <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
                             </div>
-                            <!-- Legenda do Post -->
+                            <!-- Legenda do Post - Exibida se HOUVER foto E texto -->
+                            ${(texto && fotoUrl) ? `
                             <div class="px-3 pb-2 text-sm">
-                                <p><span class="font-semibold">ana_paula</span> <b>[${refeicao}]</b> ${texto.replace(/\n/g, '<br>') || 'Sem legenda.'}</p>
+                                <p><span class="font-semibold">ana_paula</span> <b>[${refeicao}]</b> ${texto.replace(/\n/g, '<br>')}</p>
+                            </div>
+                            ` : ''}
+                            <!-- Data -->
+                            <div class="px-3 pb-2 text-sm">
                                 <span class="text-xs text-gray-400 uppercase mt-1 block">${dataFormatada}</span>
                             </div>
+                            
                             <!-- Seção de Comentários -->
                             <a href="#" class="text-xs text-gray-400 px-3 pb-2 block view-comments-btn">Ver comentários</a>
                             <div class="comment-section hidden px-3 pb-2">
@@ -765,18 +1269,23 @@
                             <input type="text" class="add-comment-input w-full border-t border-gray-200 px-3 py-2 text-sm placeholder-gray-400" placeholder="Adicione um comentário...">
                         </div>
                     `;
-                    // ***** CORREÇÃO TERMINA AQUI *****
                     
                     feedEntradas.insertAdjacentHTML('afterbegin', novaEntradaHTML);
                     lucide.createIcons(); // Recria ícones para o novo post
                     
                     // Limpa os campos
                     diarioTexto.value = '';
-                    fotoInput.value = ''; // Limpa o input de arquivo
+                    fotoInput.value = ''; 
                     fotoPreview.src = '';
                     fotoPreview.classList.add('hidden');
                     fotoUrl = null;
                     fotoLabel.textContent = 'Adicionar Foto da Refeição';
+                    excecaoCheckbox.checked = false;
+                    // Reseta o toggle de visibilidade
+                    visibilityInput.value = 'public';
+                    visibilityToggles.forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.visibility === 'public');
+                    });
 
                     // Manda o usuário de volta para o feed
                     showTab('inicio');
@@ -816,17 +1325,14 @@
             // --- INICIALIZAÇÃO E EVENT LISTENERS DO FEED ---
             loadLikesAndComments(); // Carrega curtidas e comentários salvos
 
-            // Event Delegation para ações do feed
             if (feedContainer) {
                 feedContainer.addEventListener('click', (e) => {
                     const likeIcon = e.target.closest('[data-lucide="heart"]');
                     const viewComments = e.target.closest('.view-comments-btn');
 
-                    // Lidar com clique no botão de curtir
                     if (likeIcon) {
                         handleLikeClick(likeIcon);
                     }
-                    // Lidar com clique para ver comentários (ícone ou texto)
                     if (viewComments) {
                         e.preventDefault();
                         handleViewCommentsClick(viewComments);
@@ -834,7 +1340,6 @@
                 });
 
                 feedContainer.addEventListener('keydown', (e) => {
-                    // Lidar com "Enter" no input de comentário
                     if (e.target.classList.contains('add-comment-input') && e.key === 'Enter') {
                         e.preventDefault();
                         handleAddComment(e.target);
@@ -846,3 +1351,4 @@
     </script>
 </body>
 </html>
+

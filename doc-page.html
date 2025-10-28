@@ -1,24 +1,29 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class=""> <!-- Classe 'dark' será adicionada aqui pelo JS -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal do Profissional - Foco e Saúde</title>
+    <title>Portal do Médico - MetaCheck+</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/lucide-react@0.395.0/dist/lucide-react.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Fonte estilo Instagram Logo (Mantida para posts e agora para o título) -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <script>
-        // Adiciona a cor personalizada (Novo Tom #A2574F) ao Tailwind
+        // Configuração do Tailwind para habilitar o darkMode: 'class'
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
+                    fontFamily: {
+                        // Adiciona a fonte Pacifico para ser usada com o Tailwind
+                        'pacifico': ['Pacifico', 'cursive']
+                    },
+                    colors: { // Adicionando as cores do portal do médico
                         primary: {
                             light: '#F6EAE9',      // Tom pastel claro
                             DEFAULT: '#A2574F',    // Cor Principal
@@ -33,1057 +38,1108 @@
         }
     </script>
     <style>
+        /* Estilos adicionais */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #F6EAE9; /* Fundo Pastel (primary-light) */
+            /* Fundo controlado pelo Tailwind (bg-white dark:bg-gray-900) */
         }
-        /* Esconde abas de conteúdo principal */
-        .main-tab {
+        /* Classe para abas de conteúdo ocultas */
+        .hidden-tab {
             display: none;
         }
-        /* Esconde abas de conteúdo do prontuário */
-        .prontuario-tab-content {
-            display: none;
+        /* Animação suave para transições */
+        .content-tab {
+            animation: fadeIn 0.5s ease-in-out;
         }
-        
-        /* Estilo para a barra de rolagem */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a1a1a1;
-        }
-
-        /* Animação de entrada */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
+        /* Estilo personalizado para cards */
+        .card {
+            background: white;
+            border-radius: 0.5rem; /* Menos arredondado */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
         }
-
-        /* Story ring (mantido como gradiente) */
-        .story-ring {
-            padding: 2px;
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        .dark .card {
+            background-color: #1f2937; /* gray-800 */
+            border: 1px solid #374151; /* gray-700 */
         }
-        /* Remove setas do input number */
-        input[type='number']::-webkit-inner-spin-button,
-        input[type='number']::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+        
+        /* Estilo para o Sidebar */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+            /* Cor do sidebar do médico */
+            background-color: #703A35; /* primary-darker */
+            color: #F6EAE9; /* primary-text */
         }
-        input[type='number'] {
-            -moz-appearance: textfield;
+        #sidebar-overlay {
+            transition: opacity 0.3s ease-in-out;
         }
-
-        /* Estilos do Calendário */
-        .calendar-day {
-            transition: all 0.2s ease;
-        }
-        .calendar-day:hover {
-            background-color: #fdfafa;
-        }
-        .calendar-day.today {
-            background-color: #F6EAE9;
-            border: 1px solid #EADAD8;
-        }
-        .calendar-day.selected {
-            background-color: #A2574F;
-            color: white;
-            font-weight: bold;
-        }
-        .calendar-day.has-event {
-            position: relative;
-        }
-        .calendar-day.has-event::after {
-            content: '';
-            position: absolute;
-            bottom: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background-color: #A2574F;
-        }
-        .calendar-day.selected.has-event::after {
-            background-color: white;
-        }
-
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-900">
 
-    <div id="app" class="flex h-screen overflow-hidden">
+    <!-- Cabeçalho Fixo (Layout do Mockup) -->
+    <header class="fixed top-0 left-0 w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between p-4 z-10 h-16">
         
-        <!-- === BARRA LATERAL (SIDEBAR) === -->
-        <!-- Otimizado para Mobile: 
-             - `fixed` e `-translate-x-full` por padrão (escondido fora da tela).
-             - `lg:translate-x-0` e `lg:static` (visível e estático em telas grandes).
-             - `z-30` para ficar acima do overlay.
-        -->
-        <aside id="sidebar" class="fixed top-0 left-0 z-30 w-64 h-full bg-primary-darker text-primary-text flex flex-col shrink-0 transform -translate-x-full transition-transform duration-300 lg:translate-x-0 lg:static lg:h-screen">
-            <!-- Logo/Título -->
-            <div class="h-16 flex items-center justify-center shadow-md">
-                <i data-lucide="clipboard-pulse" class="text-primary-text-darker w-6 h-6 mr-3"></i>
-                <h1 class="text-lg font-semibold">Portal Nutri</h1>
+        <!-- Botão Hambúrguer (Menu) - Esquerda -->
+        <div class="w-1/6"> <!-- Container para alinhar -->
+            <button id="menu-toggle" class="text-gray-700 dark:text-gray-300 hover:text-primary">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <!-- Título Central -->
+        <div class="flex-1 text-center">
+            <!-- Título com a fonte 'Pacifico' usando classe Tailwind -->
+            <h1 class="text-2xl dark:text-white font-pacifico text-primary dark:text-primary-light">Portal do Médico</h1>
+        </div>
+        
+        <!-- Botão de Notificações (Coração) - Direita -->
+        <div class="w-1/6 flex justify-end"> <!-- Container para alinhar -->
+            <button id="notifications-toggle" data-tab="notificacoes" class="nav-button text-gray-700 dark:text-gray-300 hover:text-red-500 relative">
+                <i data-lucide="bell" class="w-6 h-6"></i> <!-- Ícone de sino para o médico -->
+                <!-- Ponto de notificação -->
+                <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Menu Lateral (Sidebar - Doutor) -->
+    <aside id="sidebar" class="fixed top-0 left-0 w-64 h-full shadow-lg z-40 transform -translate-x-full flex flex-col">
+        <!-- Flex container for nav and theme toggle -->
+        <div class="flex-1 flex flex-col justify-between">
+            <!-- Links de Navegação (Topo) -->
+            <div>
+                <!-- Cabeçalho do Menu -->
+                <div class="h-16 flex items-center p-4 border-b border-primary-dark">
+                    <img src="https://placehold.co/40x40/A2574F/F6EAE9?text=DR" class="w-10 h-10 rounded-full mr-3 border-2 border-primary-text-darker" alt="Foto perfil">
+                    <span class="font-semibold text-sm text-white">Dr. Jean Carlos</span>
+                </div>
+                <!-- Links de Navegação -->
+                <nav class="p-4 space-y-2">
+                    <button data-tab="feed" class="nav-button w-full flex items-center p-3 rounded-lg text-base text-white bg-primary-dark font-medium">
+                        <i data-lucide="rss" class="w-5 h-5 mr-3"></i>
+                        Feed
+                    </button>
+                    <button data-tab="pacientes" class="nav-button w-full flex items-center p-3 rounded-lg text-base text-primary-text-darker hover:bg-primary-dark hover:text-white font-medium">
+                        <i data-lucide="users" class="w-5 h-5 mr-3"></i>
+                        Pacientes
+                    </button>
+                    <button data-tab="agenda" class="nav-button w-full flex items-center p-3 rounded-lg text-base text-primary-text-darker hover:bg-primary-dark hover:text-white font-medium">
+                        <i data-lucide="calendar" class="w-5 h-5 mr-3"></i>
+                        Agenda
+                    </button>
+                     <button data-tab="add-post" class="nav-button w-full flex items-center p-3 rounded-lg text-base text-primary-text-darker hover:bg-primary-dark hover:text-white font-medium">
+                        <i data-lucide="send" class="w-5 h-5 mr-3"></i>
+                        Postar Dica
+                    </button>
+                    <button data-tab="config" class="nav-button w-full flex items-center p-3 rounded-lg text-base text-primary-text-darker hover:bg-primary-dark hover:text-white font-medium">
+                        <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
+                        Configurações
+                    </button>
+                </nav>
             </div>
             
-            <!-- Navegação Principal (Reordenada) -->
-            <nav class="flex-1 px-4 py-6 space-y-2">
-                <button data-tab="dashboard" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-sm font-medium bg-primary-dark text-white transition-colors duration-200">
-                    <i data-lucide="layout-grid" class="w-5 h-5 mr-3"></i>
-                    Dashboard
-                </button>
-                <button data-tab="feed" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary-dark hover:text-white transition-colors duration-200">
-                    <i data-lucide="rss" class="w-5 h-5 mr-3"></i>
-                    Feed de Pacientes
-                </button>
-                <button data-tab="agenda" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary-dark hover:text-white transition-colors duration-200">
-                    <i data-lucide="calendar" class="w-5 h-5 mr-3"></i>
-                    Agenda
-                </button>
-                <button data-tab="pacientes" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary-dark hover:text-white transition-colors duration-200">
-                    <i data-lucide="users" class="w-5 h-5 mr-3"></i>
-                    Pacientes
-                </button>
-                <button data-tab="config" class="nav-button w-full flex items-center px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary-dark hover:text-white transition-colors duration-200">
-                    <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
-                    Configurações
-                </button>
-            </nav>
-            
-            <!-- Perfil do Profissional -->
+            <!-- Botão de Tema (Fundo) -->
             <div class="p-4 border-t border-primary-dark">
-                <div class="flex items-center">
-                    <img 
-                        src="https://placehold.co/40x40/A2574F/F6EAE9?text=DR" 
-                        alt="Foto do Profissional"
-                        class="w-10 h-10 rounded-full border-2 border-primary-text-darker"
-                    />
-                    <div class="ml-3">
-                        <p class="text-sm font-semibold">Dr. Jean Carlos</p>
-                        <p class="text-xs text-primary-text-darker">Nutricionista</p>
+                <button id="theme-toggle" class="w-full flex items-center p-3 rounded-lg text-base text-primary-text-darker hover:bg-primary-dark hover:text-white font-medium">
+                    <!-- O ícone será 'moon' ou 'sun' -->
+                    <i data-lucide="moon" class="w-5 h-5 mr-3"></i>
+                    <span>Modo Escuro</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+    <!-- Overlay para fechar o menu -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+
+
+    <div id="app" class="flex flex-col min-h-screen">
+        <!-- Conteúdo Principal que será trocado -->
+        <main class="flex-1 overflow-y-auto pt-16 pb-24"> 
+            
+            <!-- ABA FEED (Antigo Início) -->
+            <div id="feed" class="content-tab">
+                <!-- Feed de Refeições (Exatamente o mesmo do app do paciente) -->
+                <div id="feed-container" class="space-y-0">
+                    
+                    <!-- Post 1 (TEXTO - Juliana) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-jp2" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/FEF3C7/9A3412?text=JP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">juliana_p</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Conteúdo (Texto) -->
+                        <div class="p-4 pt-0">
+                            <p class="text-gray-800 dark:text-gray-200 text-base"><b>[Meta Atingida!]</b> 🎉 Consegui beber 2.5L de água hoje! Pequena vitória.</p>
+                        </div>
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3 pt-0">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">terça-feira, 21 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver 1 comentário</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                             <div class="comment-list space-y-1">
+                                 <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">ana_paula</span> Parabéns!! 🥳</p>
+                                </div>
+                             </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post (MÉDICO - Dica) -->
+                    <div class="w-full bg-green-50 dark:bg-green-900/30 border-b border-green-200 dark:border-green-800 post-container" data-post-id="post-med-1" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=M" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil Médico">
+                            <span class="font-semibold text-sm dark:text-white">medico_jean</span>
+                            <span class="ml-2 px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-medium">Médico</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Conteúdo (Texto) -->
+                        <div class="p-4 pt-0">
+                            <p class="text-gray-800 dark:text-gray-200 text-base"><b>[Dica do Dia]</b> 💧 Não se esqueçam da hidratação! Muitas vezes, nosso cérebro confunde sede com fome. Antes de beliscar, tente beber um copo de água e espere 15 minutos. #FicaADica</p>
+                        </div>
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3 pt-0">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">terça-feira, 21 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-green-900/30 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post (ana_paula - Evolução) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-ap-evo1" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ana_paula</span>
+                            <i data-lucide="globe" class="w-3 h-3 text-gray-400 ml-2" title="Público"></i>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1579362484052-18016f243236?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de uma pessoa se pesando na balança" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Evolu%C3%A7%C3%A3o';"
+                        >
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">ana_paula</span> <b>[Evolução]</b> Pessoal, -2kg na balança essa semana! Foco total na meta. 💪</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">segunda-feira, 20 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver 2 comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">medico_jean</span> <span class="text-blue-600 dark:text-blue-400 font-medium">[Médico]</span> Parabéns, Ana! Resultado incrível do seu esforço! 🚀</p>
+                                </div>
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">juliana_p</span> Uau! Que inspiração! 🤩</p>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post 2 (ana_paula - Público) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-1" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ana_paula</span>
+                            <!-- Ícone de Visibilidade (Público) -->
+                            <i data-lucide="globe" class="w-3 h-3 text-gray-400 ml-2" title="Público"></i>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1525351484163-7529414344d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de um café da manhã com ovos e abacate" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Caf%C3%A9';"
+                        >
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">ana_paula</span> <b>[Café da Manhã]</b> Começando o dia bem! 🥑 Ovos e abacate.</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">segunda-feira, 20 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">medico_jean</span> <span class="text-blue-600 dark:text-blue-400 font-medium">[Médico]</span> Que ótimo começo de dia, Ana! 👏</p>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+                    
+                    <!-- Post 3 (OUTRO PACIENTE - Juliana - Público) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-jp1" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/FEF3C7/9A3412?text=JP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">juliana_p</span>
+                            <!-- Sem ícone de visibilidade (não é nosso post) -->
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1490645935967-10de6ba1a033?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de um almoço com salmão e vegetais" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Almo%C3%A7o';"
+                        >
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">juliana_p</span> <b>[Almoço]</b> Foco! 🥗</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">segunda-feira, 20 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                 <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">ricardo_m</span> Que prato bonito!</p>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post (MÉDICO - Receita) -->
+                    <div class="w-full bg-green-50 dark:bg-green-900/30 border-b border-green-200 dark:border-green-800 post-container" data-post-id="post-med-2" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=M" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil Médico">
+                            <span class="font-semibold text-sm dark:text-white">medico_jean</span>
+                            <span class="ml-2 px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-medium">Médico</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1563738793012-f0c1f0c23a0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de mousse de abacate com cacau" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Receita';"
+                        >
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">medico_jean</span> <b>[Receita Rápida]</b> Vontade de doce? 🍫 Mousse de Abacate! <br>
+                            - 1/2 abacate maduro <br>
+                            - 1 col. sopa de cacau 100% <br>
+                            - Adoçante a gosto (stevia/xilitol) <br>
+                            Bate tudo no mixer e leve à geladeira. Fica uma delícia!</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">domingo, 19 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-green-900/30 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+                    
+                    <!-- Post 4 (ana_paula - Privado / Exceção) -->
+                    <div class="w-full bg-red-50 dark:bg-red-900/30 border-b border-red-200 dark:border-red-800 post-container" data-post-id="post-3" data-visibility="private">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ana_paula</span>
+                            <!-- Ícone de Visibilidade (Privado) -->
+                            <i data-lucide="lock" class="w-3 h-3 text-gray-500 dark:text-gray-400 ml-2" title="Privado (só você e o médico podem ver)"></i>
+                            <span class="ml-2 px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 text-xs font-medium">Exceção</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de um pedaço de bolo" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/FEE2E2/9B2C2C?text=Foto+de+Bolo';"
+                        >
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">ana_paula</span> <b>[Lanche]</b> Hoje teve exceção... 🙈 Bolo de aniversário. Mas amanhã volto 100%!</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">sábado, 18 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                            <div class="comment-list space-y-1">
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">medico_jean</span> <span class="text-blue-600 dark:text-blue-400 font-medium">[Médico]</span> Acontece, Ana! O importante é o equilíbrio e voltar ao foco amanhã. Aproveite seu momento! 😉</p>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-red-50 dark:bg-red-900/30 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post (Ricardo - Dúvida) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-rm3" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/E0E7FF/1E3A8A?text=RM" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ricardo_m</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Conteúdo (Texto) -->
+                        <div class="p-4 pt-0">
+                            <p class="text-gray-800 dark:text-gray-200 text-base"><b>[Dúvida]</b> Pessoal, como vocês lidam com a fome da tarde? Sinto muita vontade de comer pão/bolo umas 16h. Alguma sugestão de lanche que "engana" bem?</p>
+                        </div>
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3 pt-0">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">sábado, 18 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver 1 comentário</a>
+                        <div class="comment-section hidden px-3 pb-2">
+                             <div class="comment-list space-y-1">
+                                <div class="text-sm comment-item">
+                                    <p><span class="font-semibold dark:text-white">juliana_p</span> Iogurte com aveia tem me ajudado muito!</p>
+                                </div>
+                             </div>
+                        </div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post (Juliana - Lanche) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-jp3" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/FEF3C7/9A3412?text=JP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">juliana_p</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1505576391880-b3f9d713dc4f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de um lanche com pão integral e sementes" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Lanche';"
+                        >
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">juliana_p</span> <b>[Lanche da Tarde]</b> Meu pãozinho low-carb que o Dr. ensinou! Salvando meus lanches.</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">sábado, 18 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+                    
+                    <!-- Post 5 (TEXTO - Ricardo) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-rm2" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/E0E7FF/1E3A8A?text=RM" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ricardo_m</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Conteúdo (Texto) -->
+                        <div class="p-4 pt-0">
+                            <p class="text-gray-800 dark:text-gray-200 text-base">Pessoal, só para registrar, hoje o dia foi corrido e não consegui seguir 100%. Pedi um almoço que parecia saudável, mas veio cheio de molho. Fica o aprendizado.</p>
+                        </div>
+                        <!-- Ações do Post -->
+                        <div class="flex items-center space-x-4 p-3 pt-0">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <!-- Legenda do Post -->
+                        <div class="px-3 pb-2 text-sm">
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">sexta-feira, 17 de outubro de 2025</span>
+                        </div>
+                        <!-- Seção de Comentários -->
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post 6 (ana_paula - Público) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-4" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/EBFBE5/34592A?text=AP" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ana_paula</span>
+                            <i data-lucide="globe" class="w-3 h-3 text-gray-400 ml-2" title="Público"></i>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1473093226795-af9932fe5856?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de um jantar com macarrão de abobrinha" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Jantar';"
+                        >
+                        <!-- Ações e Legenda -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">ana_paula</span> <b>[Jantar]</b> Jantar mais leve: macarrão de abobrinha. 😋</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">sexta-feira, 17 de outubro de 2025</span>
+                        </div>
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                    </div>
+
+                    <!-- Post 7 (OUTRO PACIENTE - Ricardo - Público) -->
+                    <div class="w-full bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 post-container" data-post-id="post-rm1" data-visibility="public">
+                        <!-- Cabeçalho do Post -->
+                        <div class="flex items-center p-3">
+                            <img src="https://placehold.co/32x32/E0E7FF/1E3A8A?text=RM" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                            <span class="font-semibold text-sm dark:text-white">ricardo_m</span>
+                            <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                        </div>
+                        <!-- Imagem do Post -->
+                        <img 
+                            src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%D%D&auto=format&fit=crop&w=800&q=80" 
+                            alt="Foto de tigela de iogurte" 
+                            class="w-full h-auto max-h-[70vh] object-cover"
+                            onerror="this.onerror=null;this.src='https://placehold.co/600x400/EBFBE5/34592A?text=Foto+de+Iogurte';"
+                        >
+                        <!-- Ações e Legenda -->
+                        <div class="flex items-center space-x-4 p-3">
+                            <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                            <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                        </div>
+                        <div class="px-3 pb-2 text-sm">
+                            <p><span class="font-semibold dark:text-white">ricardo_m</span> <b>[Lanche da Tarde]</b> Iogurte com frutas vermelhas. Tentando variar.</p>
+                            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">quinta-feira, 16 de outubro de 2025</span>
+                        </div>
+                        <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                        <div class="comment-section hidden px-3 pb-2"><div class="comment-list space-y-1"></div></div>
+                        <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
                     </div>
                 </div>
             </div>
-        </aside>
-
-        <!-- Overlay para fechar sidebar no mobile -->
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
-
-
-        <!-- === CONTEÚDO PRINCIPAL === -->
-        <!-- Otimizado para Mobile: `w-full` para ocupar 100% da largura -->
-        <main class="w-full flex-1 flex flex-col overflow-y-auto">
-            <!-- Cabeçalho do Conteúdo -->
-            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
-                <div class="flex items-center space-x-4">
-                    <!-- Botão Menu (Hamburger) - Visível apenas no mobile (lg:hidden) -->
-                    <button id="menu-toggle" class="lg:hidden text-gray-500 hover:text-primary">
-                        <i data-lucide="menu" class="w-6 h-6"></i>
-                    </button>
-                    <h2 id="page-title" class="text-xl font-semibold text-gray-800">Dashboard</h2>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <button class="text-gray-500 hover:text-primary relative">
-                        <i data-lucide="bell" class="w-5 h-5"></i>
-                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
-                    </button>
-                    <button class="text-gray-500 hover:text-primary">
-                        <i data-lucide="mail" class="w-5 h-5"></i>
-                    </button>
-                </div>
-            </header>
-
-            <!-- Área de Conteúdo (Abas) -->
-            <div class="flex-1 p-4 md:p-6 overflow-y-auto">
-
-                <!-- === ABA 1: FEED DE PACIENTES (NOVO PADRÃO) === -->
-                <div id="feed" class="main-tab fade-in">
-                    
-                    <!-- Layout do Feed (Grid) -->
-                    <div class="max-w-3xl mx-auto">
-                        
-                        <!-- Coluna Principal (Feed) -->
-                        <div class="space-y-6">
-                            
-                            <!-- Post 1 (Ana Clara - Café) -->
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <!-- Header -->
-                                <div class="p-4 flex items-center justify-between border-b border-gray-100">
-                                    <div class="flex items-center">
-                                        <img src="https://placehold.co/32x32/F6EAE9/703A35?text=AC" class="w-8 h-8 rounded-full mr-3" alt="Ana Clara">
-                                        <span class="font-medium text-gray-800">Ana Clara</span>
-                                    </div>
-                                    <span class="text-xs text-gray-500">segunda-feira, 20/10</span>
-                                </div>
-                                <!-- Imagem -->
-                                <img src="https://images.unsplash.com/photo-1525351484163-7529414344d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
-                                     alt="Foto de ovos e abacate"
-                                     class="w-full h-auto max-h-[60vh] object-cover"
-                                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F6EAE9/A2574F?text=Foto+de+Refei%C3%A7%C3%A3o';">
-                                <!-- Conteúdo -->
-                                <div class="p-4">
-                                    <span class="text-xs font-semibold uppercase text-primary-dark bg-primary-light px-2 py-0.5 rounded-full">Café da Manhã</span>
-                                    <p class="text-sm text-gray-700 mt-2">"Começando o dia bem! 🥑 Ovos e abacate."</p>
-                                </div>
-                                <!-- Ações (Likes, Comentários) -->
-                                <div class="p-4 flex items-center space-x-4 border-t border-gray-100">
-                                    <button class="flex items-center text-gray-500 hover:text-red-500 transition-colors">
-                                        <i data-lucide="heart" class="w-5 h-5 mr-2"></i>
-                                        <span class="text-sm font-medium">Curtir</span>
-                                    </button>
-                                    <button class="flex items-center text-gray-500 hover:text-primary transition-colors">
-                                        <i data-lucide="message-circle" class="w-5 h-5 mr-2"></i>
-                                        <span class="text-sm font-medium">Comentar</span>
-                                    </button>
-                                </div>
-                                <!-- Input de Comentário -->
-                                <div class="bg-gray-50 p-3 flex items-center space-x-2 border-t border-gray-100">
-                                    <img src="https://placehold.co/32x32/A2574F/F6EAE9?text=DR" class="w-8 h-8 rounded-full" alt="Doutor(a)">
-                                    <input type="text" placeholder="Adicionar um comentário..." class="flex-1 w-full bg-gray-100 border border-gray-200 rounded-full text-sm px-4 py-1.5 focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <button class="text-primary hover:text-primary-dark text-sm font-medium pl-2">Enviar</button>
-                                </div>
-                            </div>
-
-                            <!-- Post 2 (Juliana Paiva - Almoço) -->
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <!-- Header -->
-                                <div class="p-4 flex items-center justify-between border-b border-gray-100">
-                                    <div class="flex items-center">
-                                        <img src="https://placehold.co/32x32/ede9fe/5b21b6?text=JP" class="w-8 h-8 rounded-full mr-3" alt="Juliana Paiva">
-                                        <span class="font-medium text-gray-800">Juliana Paiva</span>
-                                    </div>
-                                    <span class="text-xs text-gray-500">domingo, 19/10</span>
-                                </div>
-                                <!-- Imagem -->
-                                <img src="https://images.unsplash.com/photo-1490645935967-10de6ba1a033?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
-                                     alt="Foto de salmão e salada"
-                                     class="w-full h-auto max-h-[60vh] object-cover"
-                                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/F6EAE9/A2574F?text=Foto+de+Refei%C3%A7%C3%A3o';">
-                                <!-- Conteúdo -->
-                                <div class="p-4">
-                                    <span class="text-xs font-semibold uppercase text-primary-dark bg-primary-light px-2 py-0.5 rounded-full">Almoço</span>
-                                    <p class="text-sm text-gray-700 mt-2">"Almoço de hoje focado na meta. Salmão e salada. 🥗"</p>
-                                </div>
-                                <!-- Ações (Likes, Comentários) -->
-                                <div class="p-4 flex items-center space-x-4 border-t border-gray-100">
-                                    <button class="flex items-center text-gray-500 hover:text-red-500 transition-colors">
-                                        <i data-lucide="heart" class="w-5 h-5 mr-2"></i>
-                                        <span class="text-sm font-medium">Curtir</span>
-                                    </button>
-                                    <button class="flex items-center text-gray-500 hover:text-primary transition-colors">
-                                        <i data-lucide="message-circle" class="w-5 h-5 mr-2"></i>
-                                        <span class="text-sm font-medium">Comentar</span>
-                                    </button>
-                                </div>
-                                <!-- Input de Comentário -->
-                                <div class="bg-gray-50 p-3 flex items-center space-x-2 border-t border-gray-100">
-                                    <img src="https://placehold.co/32x32/A2574F/F6EAE9?text=DR" class="w-8 h-8 rounded-full" alt="Doutor(a)">
-                                    <input type="text" placeholder="Adicionar um comentário..." class="flex-1 w-full bg-gray-100 border border-gray-200 rounded-full text-sm px-4 py-1.5 focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <button class="text-primary hover:text-primary-dark text-sm font-medium pl-2">Enviar</button>
-                                </div>
-                            </div>
-
-                            <!-- Post 3 (Ana Clara - Exceção) -->
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-red-300">
-                                <!-- Header -->
-                                <div class="p-4 flex items-center justify-between border-b border-gray-100">
-                                    <div class="flex items-center">
-                                        <img src="https://placehold.co/32x32/F6EAE9/703A35?text=AC" class="w-8 h-8 rounded-full mr-3" alt="Ana Clara">
-                                        <span class="font-medium text-gray-800">Ana Clara</span>
-                                    </div>
-                                    <span class="text-xs text-gray-500">sábado, 18/10</span>
-                                </div>
-                                <!-- Imagem -->
-                                <img src="https://images.unsplash.com/photo-1588195538326-c5b1e9f80a1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
-                                     alt="Foto de um pedaço de bolo"
-                                     class="w-full h-auto max-h-[60vh] object-cover"
-                                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/FEE2E2/9B2C2C?text=Foto+de+Bolo';">
-                                <!-- Conteúdo -->
-                                <div class="p-4 bg-red-50">
-                                    <span class="text-xs font-semibold uppercase text-red-700 bg-red-100 px-2 py-0.5 rounded-full">Lanche (Exceção)</span>
-                                    <p class="text-sm text-gray-700 mt-2">"Hoje teve exceção... 🙈 Bolo de aniversário. Mas amanhã volto 100%!"</p>
-                                </div>
-                                <!-- Ações (Likes, Comentários) -->
-                                <div class="p-4 flex items-center space-x-4 border-t border-red-200">
-                                    <button class="flex items-center text-gray-500 hover:text-red-500 transition-colors">
-                                        <i data-lucide="heart" class="w-5 h-5 mr-2"></i>
-                                        <span class="text-sm font-medium">Curtir</span>
-                                    </button>
-                                    <button class="flex items-center text-gray-500 hover:text-primary transition-colors">
-                                        <i data-lucide="message-circle" class="w-5 h-5 mr-2"></i>
-                                        <span class="text-sm font-medium">Comentar</span>
-                                    </button>
-                                </div>
-                                <!-- Input de Comentário -->
-                                <div class="bg-red-50 p-3 flex items-center space-x-2 border-t border-red-200">
-                                    <img src="https://placehold.co/32x32/A2574F/F6EAE9?text=DR" class="w-8 h-8 rounded-full" alt="Doutor(a)">
-                                    <input type="text" placeholder="Adicionar um comentário..." class="flex-1 w-full bg-gray-100 border border-gray-200 rounded-full text-sm px-4 py-1.5 focus:ring-2 focus:ring-primary focus:border-primary">
-                                    <button class="text-primary hover:text-primary-dark text-sm font-medium pl-2">Enviar</button>
-                                </div>
-                            </div>
-                        </div>
+            
+            <!-- ABA NOTIFICAÇÕES (Doutor) -->
+            <div id="notificacoes" class="content-tab hidden-tab p-4">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">Notificações</h2>
+                <div class="space-y-6">
+                    <!-- Notificação 1 -->
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/40x40/EBFBE5/34592A?text=AP" class="w-10 h-10 rounded-full mr-3" alt="Foto perfil">
+                        <p class="text-sm flex-1"><span class="font-semibold dark:text-white">ana_paula</span> registrou uma refeição: "Café da Manhã".</p>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">10m</span>
+                    </div>
+                    <!-- Notificação 2 -->
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/40x40/FEF3C7/9A3412?text=JP" class="w-10 h-10 rounded-full mr-3" alt="Foto perfil">
+                        <p class="text-sm flex-1"><span class="font-semibold dark:text-white">juliana_p</span> marcou uma "Exceção".</p>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">1h</span>
+                    </div>
+                    <!-- Notificação 3 -->
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/40x40/E0E7FF/1E3A8A?text=RM" class="w-10 h-10 rounded-full mr-3" alt="Foto perfil">
+                        <p class="text-sm flex-1"><span class="font-semibold dark:text-white">ricardo_m</span> enviou uma "Dúvida" no feed.</p>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">3h</span>
+                    </div>
+                    <!-- Notificação 4 -->
+                    <div class="flex items-center">
+                        <img src="https://placehold.co/40x40/EBFBE5/34592A?text=AP" class="w-10 h-10 rounded-full mr-3" alt="Foto perfil">
+                        <p class="text-sm flex-1"><span class="font-semibold dark:text-white">ana_paula</span> registrou novo peso: <b>83.1 kg</b>.</p>
+                        <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">3h</span>
                     </div>
                 </div>
+            </div>
 
-                <!-- === ABA 2: DASHBOARD (MÉTRICAS) === -->
-                <div id="dashboard" class="main-tab fade-in" style="display: block;">
-                    <!-- Cards de Métricas -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                        <div class="bg-white p-5 rounded-lg shadow-md flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Consultas Hoje</p>
-                                <p class="text-3xl font-bold text-primary">8</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center">
-                                <i data-lucide="calendar" class="w-6 h-6 text-primary"></i>
-                            </div>
-                        </div>
-                        <div class="bg-white p-5 rounded-lg shadow-md flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Pacientes Ativos</p>
-                                <p class="text-3xl font-bold text-primary-dark">84</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center">
-                                <i data-lucide="users" class="w-6 h-6 text-primary-dark"></i>
-                            </div>
-                        </div>
-                        <div class="bg-white p-5 rounded-lg shadow-md flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Novos (Mês)</p>
-                                <p class="text-3xl font-bold text-blue-600">12</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                <i data-lucide="user-plus" class="w-6 h-6 text-blue-600"></i>
-                            </div>
-                        </div>
-                        <div class="bg-white p-5 rounded-lg shadow-md flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Alertas</p>
-                                <p class="text-3xl font-bold text-red-600">3</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                                <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Seções do Dashboard -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Próximas Consultas -->
-                        <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Próximas Consultas</h3>
-                            <div class="space-y-4">
-                                <div class="flex items-center">
-                                    <img src="https://placehold.co/40x40/F6EAE9/703A35?text=AC" class="w-10 h-10 rounded-full mr-3" alt="Ana Clara">
-                                    <div>
-                                        <p class="font-medium text-gray-700">Ana Clara (-1.2kg)</p>
-                                        <p class="text-sm text-gray-500">15:00 - Acompanhamento</p>
-                                    </div>
-                                    <span class="ml-auto text-sm font-semibold text-primary">15:00</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <img src="https://placehold.co/40x40/F6EAE9/703A35?text=BL" class="w-10 h-10 rounded-full mr-3" alt="Beatriz Lima">
-                                    <div>
-                                        <p class="font-medium text-gray-700">Beatriz Lima (+0.5kg)</p>
-                                        <p class="text-sm text-gray-500">15:30 - Acompanhamento</p>
-                                    </div>
-                                    <span class="ml-auto text-sm font-semibold text-gray-700">15:30</span>
-                                </div>
-                                <div class="flex items-center">
-                                    <img src="https://placehold.co/40x40/fee2e2/b91c1c?text=CS" class="w-10 h-10 rounded-full mr-3" alt="Carla Souza">
-                                    <div>
-                                        <p class="font-medium text-gray-700">Carla Souza (Nova)</p>
-                                        <p class="text-sm text-gray-500">16:00 - Primeira Consulta</p>
-                                    </div>
-                                    <span class="ml-auto text-sm font-semibold text-gray-700">16:00</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Atividade Recente do App -->
-                        <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Atividade Recente das Pacientes</h3>
-                            <ul class="divide-y divide-gray-200">
-                                <li class="py-3 flex items-center">
-                                    <i data-lucide="scale" class="w-5 h-5 text-primary-dark mr-3"></i>
-                                    <p class="text-sm"><b class="font-medium">Ana Clara</b> registrou novo peso: <b>82.5 kg</b></p>
-                                    <span class="text-xs text-gray-500 ml-auto">Há 10 min</span>
-                                </li>
-                                <li class="py-3 flex items-center">
-                                    <i data-lucide="camera" class="w-5 h-5 text-blue-500 mr-3"></i>
-                                    <p class="text-sm"><b class="font-medium">Juliana Paiva</b> registrou uma refeição: "Almoço"</p>
-                                    <span class="text-xs text-gray-500 ml-auto">Há 45 min</span>
-                                </li>
-                                <li class="py-3 flex items-center">
-                                    <i data-lucide="alert-circle" class="w-5 h-5 text-red-500 mr-3"></i>
-                                    <p class="text-sm"><b class="font-medium">Beatriz Lima</b> registrou ganho de peso: <b>+0.5 kg</b></p>
-                                    <span class="text-xs text-gray-500 ml-auto">Há 1h</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- === ABA 3: AGENDA === -->
-                <div id="agenda" class="main-tab fade-in">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Calendário -->
-                        <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-xl font-semibold text-gray-800">Outubro 2025</h3>
-                                <div class="flex space-x-2">
-                                    <button class="p-2 rounded-full hover:bg-gray-100 text-gray-500">
-                                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
-                                    </button>
-                                    <button class="p-2 rounded-full hover:bg-gray-100 text-gray-500">
-                                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Grid do Calendário -->
-                            <div class="grid grid-cols-7 gap-1 text-center">
-                                <!-- Dias da semana -->
-                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Dom</div>
-                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Seg</div>
-                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Ter</div>
-                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Qua</div>
-                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Qui</div>
-                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Sex</div>
-                                <div class="text-xs font-medium text-gray-500 uppercase py-2">Sáb</div>
-                                
-                                <!-- Dias (Exemplo estático) -->
-                                <div class="calendar-day text-gray-400 py-2">28</div>
-                                <div class="calendar-day text-gray-400 py-2">29</div>
-                                <div class="calendar-day text-gray-400 py-2">30</div>
-                                <div class="calendar-day py-2 cursor-pointer has-event">1</div>
-                                <div class="calendar-day py-2 cursor-pointer">2</div>
-                                <div class="calendar-day py-2 cursor-pointer">3</div>
-                                <div class="calendar-day py-2 cursor-pointer">4</div>
-                                <div class="calendar-day py-2 cursor-pointer">5</div>
-                                <div class="calendar-day py-2 cursor-pointer has-event">6</div>
-                                <div class="calendar-day py-2 cursor-pointer">7</div>
-                                <div class="calendar-day py-2 cursor-pointer">8</div>
-                                <div class="calendar-day py-2 cursor-pointer has-event">9</div>
-                                <div class="calendar-day py-2 cursor-pointer">10</div>
-                                <div class="calendar-day py-2 cursor-pointer">11</div>
-                                <div class="calendar-day py-2 cursor-pointer">12</div>
-                                <div class="calendar-day py-2 cursor-pointer">13</div>
-                                <div class="calendar-day py-2 cursor-pointer has-event">14</div>
-                                <div class="calendar-day py-2 cursor-pointer">15</div>
-                                <div class="calendar-day py-2 cursor-pointer">16</div>
-                                <div class="calendar-day py-2 cursor-pointer">17</div>
-                                <div class="calendar-day py-2 cursor-pointer">18</div>
-                                <div class="calendar-day py-2 cursor-pointer">19</div>
-                                <div class="calendar-day py-2 cursor-pointer has-event">20</div>
-                                <div class="calendar-day py-2 cursor-pointer">21</div>
-                                <div class="calendar-day py-2 cursor-pointer today selected has-event">22</div>
-                                <div class="calendar-day py-2 cursor-pointer">23</div>
-                                <div class="calendar-day py-2 cursor-pointer">24</div>
-                                <div class="calendar-day py-2 cursor-pointer">25</div>
-                                <div class="calendar-day py-2 cursor-pointer">26</div>
-                                <div class="calendar-day py-2 cursor-pointer has-event">27</div>
-                                <div class="calendar-day py-2 cursor-pointer">28</div>
-                                <div class="calendar-day py-2 cursor-pointer has-event">29</div>
-                                <div class="calendar-day py-2 cursor-pointer">30</div>
-                                <div class="calendar-day py-2 cursor-pointer">31</div>
-                            </div>
-                        </div>
-
-                        <!-- Compromissos do Dia -->
-                        <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Hoje (Quarta, 22/10)</h3>
-                            <div class="space-y-4">
-                                <!-- Compromisso 1 -->
-                                <div class="p-4 rounded-lg border-l-4 border-primary bg-primary-light">
-                                    <p class="font-medium text-primary-darker">Ana Clara</p>
-                                    <p class="text-sm text-gray-700">15:00 - Acompanhamento</p>
-                                    <p class="text-xs text-gray-500 mt-1">Status: Confirmado</p>
-                                </div>
-                                <!-- Compromisso 2 -->
-                                <div class="p-4 rounded-lg border-l-4 border-primary bg-primary-light">
-                                    <p class="font-medium text-primary-darker">Beatriz Lima</p>
-                                    <p class="text-sm text-gray-700">15:30 - Acompanhamento</p>
-                                    <p class="text-xs text-gray-500 mt-1">Status: Confirmado</p>
-                                </div>
-                                <!-- Compromisso 3 -->
-                                <div class="p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50">
-                                    <p class="font-medium text-blue-800">Carla Souza</p>
-                                    <p class="text-sm text-gray-700">16:00 - Primeira Consulta</p>
-                                    <p class="text-xs text-gray-500 mt-1">Status: Agendado</p>
-                                </div>
-                                <!-- Compromisso 4 -->
-                                <div class="p-4 rounded-lg border-l-4 border-gray-400 bg-gray-50">
-                                    <p class="font-medium text-gray-600">Almoço</p>
-                                    <p class="text-sm text-gray-700">12:00 - 13:00</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- ABA ADICIONAR POST (Doutor) -->
+            <div id="add-post" class="content-tab hidden-tab p-4">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Postar Dica ou Receita 💡</h2>
                 
-                <!-- === ABA 4: LISTA DE PACIENTES === -->
-                <div id="pacientes" class="main-tab fade-in">
-                    <div class="bg-white p-6 rounded-lg shadow-md">
-                        <div class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
-                            <h3 class="text-xl font-semibold text-gray-800">Lista de Pacientes (84)</h3>
-                            <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 w-full md:w-auto">
-                                <input type="text" placeholder="Buscar paciente..." class="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
-                                <button class="w-full md:w-auto bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark flex items-center justify-center">
-                                    <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>
-                                    Novo Paciente
-                                </button>
+                <div class="card p-4 mb-6 shadow-none border border-gray-200 dark:border-gray-700 rounded-lg dark:bg-gray-800">
+                    <!-- Preview da Imagem -->
+                    <img id="foto-preview" class="hidden w-full h-48 object-cover rounded-lg mb-3 border border-gray-200 dark:border-gray-600" alt="Preview da refeição">
+
+                    <!-- Input da Foto -->
+                    <input type="file" id="diario-foto-input" class="hidden" accept="image/*">
+                    <label for="diario-foto-input" class="w-full cursor-pointer bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border border-dashed border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-center transition-all mb-3">
+                        <i data-lucide="camera" class="w-4 h-4 mr-2"></i>
+                        <span id="foto-label">Adicionar Foto (Opcional)</span>
+                    </label>
+
+                    <!-- Tipo de Refeição -->
+                    <select id="diario-refeicao" class="w-full border rounded-xl p-3 text-sm border-primary-light dark:border-primary-dark focus:ring-2 focus:ring-primary bg-white dark:bg-gray-700 dark:text-white mb-3">
+                        <option>Dica do Dia</option>
+                        <option>Receita</option>
+                        <option>Aviso</option>
+                        <option>Motivacional</option>
+                    </select>
+
+                    <!-- Anotações -->
+                    <textarea
+                        id="diario-texto"
+                        placeholder="Escreva a dica ou receita..."
+                        class="w-full p-3 border rounded-xl border-primary-light dark:border-primary-dark mb-3 text-sm focus:ring-2 focus:ring-primary focus:border-primary transition resize-none dark:bg-gray-700 dark:text-white"
+                        rows="5"
+                    ></textarea>
+
+                    <!-- Botão de Publicar (Cor do Médico) -->
+                    <button id="salvar-diario" class="w-full bg-gradient-to-r from-primary to-primary-dark text-white px-4 py-3 rounded-xl text-sm font-semibold hover:opacity-90 transition-all shadow-md">
+                        Publicar para Pacientes
+                    </button>
+                </div>
+            </div>
+
+            <!-- ABA PACIENTES (NOVA) -->
+            <div id="pacientes" class="content-tab hidden-tab p-4">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Meus Pacientes</h2>
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+                    <input type="text" placeholder="Buscar paciente..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white mb-4">
+                    
+                    <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <!-- Paciente 1 -->
+                        <li class="py-3 flex items-center">
+                            <img src="https://placehold.co/40x40/EBFBE5/34592A?text=AP" class="w-10 h-10 rounded-full mr-3" alt="Ana Paula">
+                            <div>
+                                <p class="font-medium dark:text-white">ana_paula</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Meta: -10kg | Adesão: Alta</p>
                             </div>
+                            <button class="ml-auto text-sm text-primary font-medium">Ver Prontuário</button>
+                        </li>
+                        <!-- Paciente 2 -->
+                        <li class="py-3 flex items-center">
+                            <img src="https://placehold.co/40x40/FEF3C7/9A3412?text=JP" class="w-10 h-10 rounded-full mr-3" alt="Juliana P.">
+                            <div>
+                                <p class="font-medium dark:text-white">juliana_p</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Meta: -8kg | Adesão: Média</p>
+                            </div>
+                            <button class="ml-auto text-sm text-primary font-medium">Ver Prontuário</button>
+                        </li>
+                        <!-- Paciente 3 -->
+                        <li class="py-3 flex items-center">
+                            <img src="https://placehold.co/40x40/E0E7FF/1E3A8A?text=RM" class="w-10 h-10 rounded-full mr-3" alt="Ricardo M.">
+                            <div>
+                                <p class="font-medium dark:text-white">ricardo_m</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Meta: -15kg | Adesão: Baixa</p>
+                            </div>
+                            <button class="ml-auto text-sm text-primary font-medium">Ver Prontuário</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ABA AGENDA (NOVA) -->
+            <div id="agenda" class="content-tab hidden-tab p-4">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Minha Agenda</h2>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Próximos Compromissos</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 rounded-lg border-l-4 border-primary bg-primary-light dark:bg-primary-darker dark:border-primary-light">
+                            <p class="font-medium text-primary-darker dark:text-primary-light">Ana Paula (Acompanhamento)</p>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">Hoje, 15:00 - 15:30</p>
                         </div>
-                        
-                        <!-- Tabela de Pacientes -->
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left">
-                                <thead class="border-b bg-gray-50 text-xs text-gray-600 uppercase">
-                                    <tr>
-                                        <th class="py-3 px-4 font-medium">Paciente</th>
-                                        <th class="py-3 px-4 font-medium">Progresso (30d)</th>
-                                        <th class="py-3 px-4 font-medium">Adesão</th>
-                                        <th class="py-3 px-4 font-medium">Próx. Consulta</th>
-                                        <th class="py-3 px-4 font-medium text-center">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-200">
-                                    <!-- Paciente 1 -->
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-4 flex items-center">
-                                            <img src="https://placehold.co/32x32/F6EAE9/703A35?text=AC" class="w-8 h-8 rounded-full mr-3" alt="Ana Clara">
-                                            <span class="font-medium text-gray-800">Ana Clara</span>
-                                        </td>
-                                        <td class="p-4 text-sm text-primary-dark font-medium">-1.2 kg</td>
-                                        <td class="p-4 text-sm">
-                                            <span class="px-3 py-1 rounded-full bg-primary-light text-primary-darker text-xs font-medium">Alta</span>
-                                        </td>
-                                        <td class="p-4 text-sm text-gray-700">22/10/2025 (Hoje)</td>
-                                        <td class="p-4 text-center">
-                                            <button data-patient="Ana Clara" class="view-patient-btn text-primary hover:text-primary-dark text-sm font-medium">
-                                                Ver Prontuário
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <!-- Paciente 2 -->
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-4 flex items-center">
-                                            <img src="https://placehold.co/32x32/F6EAE9/703A35?text=BL" class="w-8 h-8 rounded-full mr-3" alt="Beatriz Lima">
-                                            <span class="font-medium text-gray-800">Beatriz Lima</span>
-                                        </td>
-                                        <td class="p-4 text-sm text-red-600 font-medium">+0.5 kg</td>
-                                        <td class="p-4 text-sm">
-                                            <span class="px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-medium">Baixa</span>
-                                        </td>
-                                        <td class="p-4 text-sm text-gray-700">22/10/2025 (Hoje)</td>
-                                        <td class="p-4 text-center">
-                                            <button data-patient="Beatriz Lima" class="view-patient-btn text-primary hover:text-primary-dark text-sm font-medium">
-                                                Ver Prontuário
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <!-- Paciente 3 -->
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-4 flex items-center">
-                                            <img src="https://placehold.co/32x32/fee2e2/b91c1c?text=CS" class="w-8 h-8 rounded-full mr-3" alt="Carla Souza">
-                                            <span class="font-medium text-gray-800">Carla Souza</span>
-                                        </td>
-                                        <td class="p-4 text-sm text-gray-700">Iniciando</td>
-                                        <td class="p-4 text-sm">
-                                            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-medium">N/A</span>
-                                        </td>
-                                        <td class="p-4 text-sm text-gray-700">22/10/2025 (Hoje)</td>
-                                        <td class="p-4 text-center">
-                                            <button data-patient="Carla Souza" class="view-patient-btn text-primary hover:text-primary-dark text-sm font-medium">
-                                                Ver Prontuário
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <!-- Paciente 4 -->
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="p-4 flex items-center">
-                                            <img src="https://placehold.co/32x32/ede9fe/5b21b6?text=JP" class="w-8 h-8 rounded-full mr-3" alt="Juliana Paiva">
-                                            <span class="font-medium text-gray-800">Juliana Paiva</span>
-                                        </td>
-                                        <td class="p-4 text-sm text-primary-dark font-medium">-2.1 kg</td>
-                                        <td class="p-4 text-sm">
-                                            <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium">Média</span>
-                                        </td>
-                                        <td class="p-4 text-sm text-gray-700">29/10/2025</td>
-                                        <td class="p-4 text-center">
-                                            <button data-patient="Juliana Paiva" class="view-patient-btn text-primary hover:text-primary-dark text-sm font-medium">
-                                                Ver Prontuário
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/50 dark:border-blue-400">
+                            <p class="font-medium text-blue-800 dark:text-blue-300">Nova Consulta (Paciente a confirmar)</p>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">Amanhã, 10:00 - 11:00</p>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- === ABA 5: PRONTUÁRIO DA PACIENTE (ÁREA DE CONSULTA) === -->
-                <div id="prontuario" class="main-tab fade-in">
-                    <!-- Cabeçalho do Prontuário -->
-                    <div class="mb-4">
-                        <button id="back-to-patients" class="flex items-center text-sm text-primary hover:text-primary-dark font-medium mb-2">
-                            <i data-lucide="chevron-left" class="w-4 h-4 mr-1"></i>
-                            Voltar para Pacientes
+            <!-- ABA CONFIGURAÇÕES (NOVA) -->
+            <div id="config" class="content-tab hidden-tab p-4">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Configurações</h2>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Preferências da Conta</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="nome" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome de Exibição</label>
+                            <input type="text" id="nome" value="Dr. Jean Carlos" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white">
+                        </div>
+                        <div>
+                            <label for="crn" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CRN</label>
+                            <input type="text" id="crn" value="CRN-3 12345" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:text-white">
+                        </div>
+                        <button class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors">
+                            Salvar Alterações
                         </button>
-                        <h3 id="prontuario-nome" class="text-2xl font-semibold text-gray-800">Prontuário: Ana Clara</h3>
-                        <p class="text-gray-600">Peso Inicial: 85.0 kg | Meta: 75.0 kg</p>
-                    </div>
-
-                    <!-- Abas do Prontuário -->
-                    <div class="border-b border-gray-200 mb-6">
-                        <nav class="-mb-px flex space-x-6 overflow-x-auto">
-                            <button data-tab="app-data" class="prontuario-tab-btn py-3 px-1 border-b-2 border-primary text-primary font-medium text-sm whitespace-nowrap">
-                                <i data-lucide="smartphone" class="w-4 h-4 mr-2 inline-block"></i>
-                                Dados do App
-                            </button>
-                            <button data-tab="resumo" class="prontuario-tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm whitespace-nowrap">
-                                <i data-lucide="clipboard-list" class="w-4 h-4 mr-2 inline-block"></i>
-                                Resumo Clínico
-                            </button>
-                            <button data-tab="plano" class="prontuario-tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm whitespace-nowrap">
-                                <i data-lucide="file-text" class="w-4 h-4 mr-2 inline-block"></i>
-                                Plano Alimentar
-                            </button>
-                            <button data-tab="exames" class="prontuario-tab-btn py-3 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm whitespace-nowrap">
-                                <i data-lucide="flask-conical" class="w-4 h-4 mr-2 inline-block"></i>
-                                Exames
-                            </button>
-                        </nav>
-                    </div>
-
-                    <!-- === CONTEÚDO DAS ABAS DO PRONTUÁRIO === -->
-
-                    <!-- ABA PRONTUÁRIO: DADOS DO APP (COM FOTOS) -->
-                    <div id="prontuario-app-data" class="prontuario-tab-content fade-in" style="display: block;">
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            
-                            <!-- Diário Alimentar com Fotos -->
-                            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-                                <h5 class="text-md font-semibold text-gray-700 mb-4">Diário Alimentar (Fotos)</h5>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto">
-                                    
-                                    <!-- Entrada de Refeição 1 -->
-                                    <div class="rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                                        <img src="https://placehold.co/600x400/F6EAE9/A2574F?text=Foto+do+Almo%C3%A7o" alt="Foto da refeição" class="w-full h-40 object-cover">
-                                        <div class="p-4">
-                                            <div class="flex justify-between items-center mb-1">
-                                                <span class="font-semibold text-primary-dark">Almoço</span>
-                                                <span class="text-xs text-gray-500">01/10/2025</span>
-                                            </div>
-                                            <p class="text-sm text-gray-700">"Salada completa e frango grelhado. Me senti satisfeita."</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Entrada de Refeição 2 -->
-                                    <div class="rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                                        <img src="https://placehold.co/600x400/F6EAE9/A2574F?text=Foto+do+Jantar" alt="Foto da refeição" class="w-full h-40 object-cover">
-                                        <div class="p-4">
-                                            <div class="flex justify-between items-center mb-1">
-                                                <span class="font-semibold text-primary-dark">Jantar</span>
-                                                <span class="text-xs text-gray-500">30/09/2025</span>
-                                            </div>
-                                            <p class="text-sm text-gray-700">"Sopa de legumes. Fiquei com um pouco de fome depois."</p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Entrada de Refeição 3 -->
-                                    <div class="rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                                        <img src="https://placehold.co/600x400/FFF9E6/7A4F01?text=Foto+do+Lanche" alt="Foto da refeição" class="w-full h-40 object-cover">
-                                        <div class="p-4">
-                                            <div class="flex justify-between items-center mb-1">
-                                                <span class="font-semibold text-yellow-700">Lanche da Tarde</span>
-                                                <span class="text-xs text-gray-500">30/09/2025</span>
-                                            </div>
-                                            <p class="text-sm text-gray-700">"Comi um iogurte e castanhas. Foi ok, mas queria um doce."</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Entrada de Refeição 4 (Exemplo de "fora do plano") -->
-                                    <div class="rounded-lg border-2 border-red-300 overflow-hidden shadow-sm bg-red-50">
-                                        <img src="https://placehold.co/600x400/FEE2E2/9B2C2C?text=Fora+do+Plano" alt="Foto da refeição" class="w-full h-40 object-cover">
-                                        <div class="p-4">
-                                            <div class="flex justify-between items-center mb-1">
-                                                <span class="font-semibold text-red-700">Jantar (Exceção)</span>
-                                                <span class="text-xs text-gray-500">29/09/2025</span>
-                                            </div>
-                                            <p class="text-sm text-gray-700">"Aniversário do meu filho. Comi pizza e bolo. Me senti culpada."</p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Entrada de Refeição 5 -->
-                                    <div class="rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                                        <img src="https://placehold.co/600x400/F6EAE9/A2574F?text=Foto+do+Almo%C3%A7o" alt="Foto da refeição" class="w-full h-40 object-cover">
-                                        <div class="p-4">
-                                            <div class="flex justify-between items-center mb-1">
-                                                <span class="font-semibold text-primary-dark">Almoço</span>
-                                                <span class="text-xs text-gray-500">29/09/2025</span>
-                                            </div>
-                                            <p class="text-sm text-gray-700">"Repeti o de ontem. Salada e frango."</p>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <!-- Acompanhamento de Peso -->
-                            <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md">
-                                <h5 class="text-md font-semibold text-gray-700 mb-3">Histórico de Peso</h5>
-                                <ul class="divide-y divide-gray-200 max-h-80 overflow-y-auto">
-                                    <!-- Entrada de peso (fake data do app da paciente) -->
-                                    <li class="py-3 flex justify-between items-center">
-                                        <div class="flex items-center">
-                                            <i data-lucide="scale" class="w-4 h-4 text-primary mr-3"></i>
-                                            <span class="text-sm text-gray-700">01/10/2025</span>
-                                        </div>
-                                        <span class="font-semibold text-gray-800 text-sm">82.5 kg</span>
-                                    </li>
-                                    <li class="py-3 flex justify-between items-center">
-                                        <div class="flex items-center">
-                                            <i data-lucide="scale" class="w-4 h-4 text-primary mr-3"></i>
-                                            <span class="text-sm text-gray-700">25/09/2025</span>
-                                        </div>
-                                        <span class="font-semibold text-gray-800 text-sm">83.1 kg</span>
-                                    </li>
-                                    <!-- Entrada de peso -->
-                                    <li class="py-3 flex justify-between items-center">
-                                        <div class="flex items-center">
-                                            <i data-lucide="scale" class="w-4 h-4 text-primary mr-3"></i>
-                                            <span class="text-sm text-gray-700">18/09/2025</span>
-                                        </div>
-                                        <span class="font-semibold text-gray-800 text-sm">83.9 kg</span>
-                                    </li>
-                                    <!-- Entrada de peso -->
-                                    <li class="py-3 flex justify-between items-center">
-                                        <div class="flex items-center">
-                                            <i data-lucide="scale" class="w-4 h-4 text-primary mr-3"></i>
-                                            <span class="text-sm text-gray-700">11/09/2025 (Início)</span>
-                                        </div>
-                                        <span class="font-semibold text-gray-800 text-sm">85.0 kg</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ABA PRONTUÁRIO: RESUMO CLÍNICO -->
-                    <div id="prontuario-resumo" class="prontuario-tab-content fade-in">
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h5 class="text-md font-semibold text-gray-700 mb-4">Resumo Clínico</h5>
-                            <div class="space-y-3 text-sm">
-                                <p><b class="font-medium text-gray-600">Queixa Principal:</b> Paciente busca emagrecimento e reeducação alimentar.</p>
-                                <p><b class="font-medium text-gray-600">Antecedentes Pessoais:</b> Levemente hipertensa (controlada), histórico familiar de DM2.</p>
-                                <p><b class="font-medium text-gray-600">Exame Físico (Hoje):</b> PA: 120/80 mmHg, Peso: 82.5 kg, Altura: 1.65m, IMC: 30.3 (Obesidade Grau I).</p>
-                                <p><b class="font-medium text-gray-600">Plano de Conduta:</b> Ajustar plano alimentar focado em déficit calórico e proteínas. Solicitar exames de rotina (glicemia, perfil lipídico). Reforçar meta de atividade física (3x/semana). Retorno em 4 semanas.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ABA PRONTUÁRIO: PLANO ALIMENTAR -->
-                    <div id="prontuario-plano" class="prontuario-tab-content fade-in">
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h5 class="text-md font-semibold text-gray-700 mb-4">Plano Alimentar (PDF)</h5>
-                            <div class="p-4 border rounded-lg flex justify-between items-center">
-                                <div>
-                                    <p class="font-medium">Plano Alimentar - Ana Clara - 22-10-2025.pdf</p>
-                                    <p class="text-sm text-gray-500">Arquivo de 1.2MB - Atualizado hoje</p>
-                                </div>
-                                <button class="text-primary text-sm font-medium">Baixar PDF</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ABA PRONTUÁRIO: EXAMES -->
-                    <div id="prontuario-exames" class="prontuario-tab-content fade-in">
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h5 class="text-md font-semibold text-gray-700 mb-4">Resultados de Exames</h5>
-                            <div class="space-y-3">
-                                <div class="p-3 border rounded-lg flex justify-between items-center">
-                                    <div>
-                                        <p class="font-medium">Exames Laboratoriais (Sangue)</p>
-                                        <p class="text-sm text-gray-500">Data: 10/09/2025 - Glicemia, Colesterol, etc.</p>
-                                    </div>
-                                    <button class="text-primary text-sm font-medium">Ver PDF</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                
-                <!-- === ABA 6: CONFIGURAÇÕES === -->
-                <div id="config" class="main-tab fade-in">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Menu de Configurações -->
-                        <div class="md:col-span-1">
-                            <div class="bg-white p-4 rounded-lg shadow-md">
-                                <nav class="space-y-1">
-                                    <button class="w-full text-left flex items-center px-4 py-2 rounded-lg bg-primary-light text-primary-dark font-medium">
-                                        <i data-lucide="user" class="w-4 h-4 mr-3"></i>
-                                        Perfil
-                                    </button>
-                                    <button class="w-full text-left flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-800">
-                                        <i data-lucide="shield" class="w-4 h-4 mr-3"></i>
-                                        Segurança
-                                    </button>
-                                    <button class="w-full text-left flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-800">
-                                        <i data-lucide="bell" class="w-4 h-4 mr-3"></i>
-                                        Notificações
-                                    </button>
-                                    <button class="w-full text-left flex items-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-gray-800">
-                                        <i data-lucide="layout-template" class="w-4 h-4 mr-3"></i>
-                                        Integrações
-                                    </button>
-                                </nav>
-                            </div>
-                        </div>
-
-                        <!-- Conteúdo das Configurações -->
-                        <div class="md:col-span-2">
-                            <div class="bg-white p-6 rounded-lg shadow-md">
-                                <h3 class="text-xl font-semibold text-gray-800 mb-6">Meu Perfil</h3>
-                                
-                                <!-- Formulário de Perfil -->
-                                <form class="space-y-4">
-                                    <!-- Foto de Perfil -->
-                                    <div class="flex items-center space-x-4">
-                                        <img src="https://placehold.co/64x64/A2574F/F6EAE9?text=DR" alt="Foto do Profissional" class="w-16 h-16 rounded-full border-2 border-primary-light">
-                                        <div>
-                                            <button type="button" class="text-sm font-medium text-primary hover:text-primary-dark">Mudar foto</button>
-                                            <p class="text-xs text-gray-500 mt-1">PNG ou JPG, máx 2MB.</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Nome Completo -->
-                                    <div>
-                                        <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
-                                        <input type="text" id="nome" value="Dr. Jean Carlos" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
-                                    </div>
-
-                                    <!-- Email -->
-                                    <div>
-                                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                        <input type="email" id="email" value="dr.jean.carlos@meuemail.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 text-gray-500" disabled>
-                                    </div>
-
-                                    <!-- CRN -->
-                                    <div>
-                                        <label for="crn" class="block text-sm font-medium text-gray-700 mb-1">CRN</label>
-                                        <input type="text" id="crn" value="CRN-3 12345" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
-                                    </div>
-                                    
-                                    <!-- Botão Salvar -->
-                                    <div class="pt-2 text-right">
-                                        <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors">
-                                            Salvar Alterações
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <!-- Alterar Senha (Exemplo em outra aba de config) -->
-                            <div class="bg-white p-6 rounded-lg shadow-md mt-6">
-                                <h3 class="text-xl font-semibold text-gray-800 mb-6">Alterar Senha</h3>
-                                <form class="space-y-4">
-                                    <div>
-                                        <label for="senha-atual" class="block text-sm font-medium text-gray-700 mb-1">Senha Atual</label>
-                                        <input type="password" id="senha-atual" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
-                                    </div>
-                                    <div>
-                                        <label for="nova-senha" class="block text-sm font-medium text-gray-700 mb-1">Nova Senha</label>
-                                        <input type="password" id="nova-senha" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
-                                    </div>
-                                    <div>
-                                        <label for="confirmar-senha" class="block text-sm font-medium text-gray-700 mb-1">Confirmar Nova Senha</label>
-                                        <input type="password" id="confirmar-senha" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
-                                    </div>
-                                    <div class="pt-2 text-right">
-                                        <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors">
-                                            Atualizar Senha
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
                     </div>
                 </div>
-
-
             </div>
+
         </main>
+
+        <!-- Botão Flutuante de Adicionar Dica (Médico) -->
+        <button id="floating-add-btn" data-tab="add-post" class="nav-button fixed bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-gradient-to-r from-primary to-primary-dark text-white rounded-full flex items-center justify-center shadow-lg z-20 transform transition-transform hover:scale-105">
+            <i data-lucide="plus" class="w-8 h-8"></i>
+        </button>
     </div>
+    
+    <!-- Modal de Alerta Customizado -->
+    <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-sm text-center card">
+            <p id="modal-message" class="text-gray-700 dark:text-gray-200 mb-4"></p>
+            <button id="modal-close" class="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-dark transition">
+                OK
+            </button>
+        </div>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Inicializa ícones
-            lucide.createIcons();
+            // --- LÓGICA DE TEMA (CLARO/ESCURO) ---
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle ? themeToggle.querySelector('i') : null;
+            const themeText = themeToggle ? themeToggle.querySelector('span') : null;
 
-            const navButtons = document.querySelectorAll('.nav-button');
-            const mainTabs = document.querySelectorAll('.main-tab');
-            const pageTitle = document.getElementById('page-title');
+            // Função para aplicar o tema (dark/light)
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    if (themeIcon) {
+                        themeIcon.setAttribute('data-lucide', 'sun');
+                        themeText.textContent = 'Modo Claro';
+                    }
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    if (themeIcon) {
+                        themeIcon.setAttribute('data-lucide', 'moon');
+                        themeText.textContent = 'Modo Escuro';
+                    }
+                }
+                // Recriar ícones do Lucide após mudar (importante para o toggle)
+                lucide.createIcons();
+            }
 
-            // --- LÓGICA DO MENU MOBILE ---
+            // Carrega o tema salvo no localStorage ou prefere o do sistema
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            let currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+            
+            // Aplica o tema ANTES de renderizar os ícones pela primeira vez
+            applyTheme(currentTheme);
+
+            // Event listener para o botão de toggle
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    let newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+                    localStorage.setItem('theme', newTheme);
+                    applyTheme(newTheme);
+                });
+            }
+
+            // --- Seletores da Nova Navegação ---
             const menuToggle = document.getElementById('menu-toggle');
             const sidebar = document.getElementById('sidebar');
             const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const navButtons = document.querySelectorAll('.nav-button'); // Inclui botões do sidebar, flutuante e de notificações
+            
+            let activeTabId = 'feed'; // Doutor começa no Feed
 
+            const contentTabs = document.querySelectorAll('.content-tab');
+            const feedContainer = document.getElementById('feed-container');
+
+            // --- LÓGICA DO SIDEBAR (MENU HAMBÚRGUER) ---
             function toggleSidebar() {
-                if (sidebar && sidebarOverlay) {
-                    sidebar.classList.toggle('-translate-x-full');
-                    sidebarOverlay.classList.toggle('hidden');
+                sidebar.classList.toggle('-translate-x-full');
+                sidebarOverlay.classList.toggle('hidden');
+                // Recriar ícones no sidebar quando ele abre
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    lucide.createIcons();
                 }
             }
 
-            if (menuToggle && sidebar && sidebarOverlay) {
+            if (menuToggle) {
                 menuToggle.addEventListener('click', toggleSidebar);
+            }
+            if (sidebarOverlay) {
                 sidebarOverlay.addEventListener('click', toggleSidebar);
             }
 
-            
-            // --- NAVEGAÇÃO PRINCIPAL (ABAS LATERAIS) ---
-            function showMainTab(tabId) {
-                // Esconde todas as abas principais
-                mainTabs.forEach(tab => {
-                    tab.style.display = 'none';
-                });
-                
-                // Mostra a aba alvo
-                const targetTab = document.getElementById(tabId);
-                if (targetTab) {
-                    targetTab.style.display = 'block';
-                }
+            // --- CARREGAR ESTADO INICIAL (CURTIDAS E COMENTÁRIOS) ---
+            function loadLikesAndComments() {
+                const likes = JSON.parse(localStorage.getItem('meuProgressoLikes')) || {};
+                const comments = JSON.parse(localStorage.getItem('meuProgressoComments')) || {};
 
-                // Atualiza o título da página
-                let title = tabId.charAt(0).toUpperCase() + tabId.slice(1);
-                if (tabId === 'prontuario') {
-                    // O título do prontuário é tratado de forma especial
-                    // O nome é definido ao clicar no paciente
-                    return; 
-                }
-                if (tabId === 'config') {
-                    title = 'Configurações';
-                }
-                if (tabId === 'feed') {
-                    title = 'Feed de Pacientes';
-                }
-                 if (tabId === 'dashboard') {
-                    title = 'Dashboard';
-                }
-                pageTitle.textContent = title;
+                document.querySelectorAll('.post-container').forEach(post => {
+                    const postId = post.dataset.postId;
+                    if (!postId) return;
 
-                // Atualiza o estado ativo dos botões da barra lateral
-                navButtons.forEach(btn => {
-                    if (btn.dataset.tab === tabId) {
-                        btn.classList.add('bg-primary-dark', 'text-white');
-                        btn.classList.remove('hover:bg-primary-dark', 'hover:text-white');
-                    } else {
-                        btn.classList.remove('bg-primary-dark', 'text-white');
-                        btn.classList.add('hover:bg-primary-dark', 'hover:text-white');
+                    // Carregar Curtidas
+                    if (likes[postId]) {
+                        const likeButton = post.querySelector('[data-lucide="heart"]');
+                        if (likeButton) {
+                            likeButton.classList.add('fill-red-500', 'text-red-500');
+                        }
+                    }
+
+                    // Carregar Comentários
+                    const commentList = post.querySelector('.comment-list');
+                    if (comments[postId] && commentList) {
+                        comments[postId].forEach(comment => {
+                            // Adiciona destaque visual se for [Médico]
+                            const isMedico = comment.user === 'medico_jean';
+                            const userHtml = isMedico ? 
+                                `<span class="font-semibold dark:text-white">${comment.user}</span> <span class="text-blue-600 dark:text-blue-400 font-medium">[Médico]</span>` :
+                                `<span class="font-semibold dark:text-white">${comment.user}</span>`;
+
+                            const commentHtml = `
+                                <div class="text-sm comment-item">
+                                    <p>${userHtml} ${comment.text}</p>
+                                </div>
+                            `;
+                            commentList.insertAdjacentHTML('beforeend', commentHtml);
+                        });
                     }
                 });
+            }
+            
+            // --- FUNÇÕES DE MANIPULAÇÃO DO FEED ---
+            // Lógica de Curtir
+            function handleLikeClick(buttonEl) {
+                const post = buttonEl.closest('.post-container');
+                const postId = post.dataset.postId;
+                if (!postId) return;
 
-                // Esconder sidebar no mobile ao clicar em um item
-                if (window.innerWidth < 1024) { // 1024px = lg
-                    toggleSidebar();
+                buttonEl.classList.toggle('fill-red-500');
+                buttonEl.classList.toggle('text-red-500');
+                
+                const isLiked = buttonEl.classList.contains('fill-red-500');
+                let likes = JSON.parse(localStorage.getItem('meuProgressoLikes')) || {};
+
+                if (isLiked) {
+                    likes[postId] = true;
+                } else {
+                    delete likes[postId];
+                }
+                localStorage.setItem('meuProgressoLikes', JSON.stringify(likes));
+            }
+
+            // Lógica de Ver Comentários
+            function handleViewCommentsClick(buttonEl) {
+                const post = buttonEl.closest('.post-container');
+                const commentSection = post.querySelector('.comment-section');
+                if (commentSection) {
+                    commentSection.classList.toggle('hidden');
                 }
             }
 
-            // Adiciona evento de clique aos botões da barra lateral
+            // Lógica de Adicionar Comentário (PERSPECTIVA DO MÉDICO)
+            function handleAddComment(inputEl) {
+                const text = inputEl.value.trim();
+                if (text === '') return;
+
+                const post = inputEl.closest('.post-container');
+                const postId = post.dataset.postId;
+                const commentList = post.querySelector('.comment-list');
+                if (!postId || !commentList) return;
+
+                const newComment = {
+                    user: 'medico_jean', // <-- ALTERADO
+                    text: text
+                };
+
+                // Adicionar ao UI (com tag de médico)
+                const commentHtml = `
+                    <div class="text-sm comment-item">
+                        <p><span class="font-semibold dark:text-white">${newComment.user}</span> <span class="text-blue-600 dark:text-blue-400 font-medium">[Médico]</span> ${newComment.text}</p>
+                    </div>
+                `;
+                commentList.insertAdjacentHTML('beforeend', commentHtml);
+                inputEl.value = ''; // Limpar input
+
+                // Salvar no localStorage
+                let comments = JSON.parse(localStorage.getItem('meuProgressoComments')) || {};
+                if (!comments[postId]) {
+                    comments[postId] = [];
+                }
+                comments[postId].push(newComment);
+                localStorage.setItem('meuProgressoComments', JSON.stringify(comments));
+
+                // Abrir seção de comentários se estiver fechada
+                const commentSection = post.querySelector('.comment-section');
+                if (commentSection && commentSection.classList.contains('hidden')) {
+                    commentSection.classList.remove('hidden');
+                }
+            }
+
+
+            // --- LÓGICA DE NAVEGAÇÃO ENTRE ABAS (ATUALIZADA) ---
+            const notificationsToggle = document.getElementById('notifications-toggle');
+            const notificationDot = notificationsToggle ? notificationsToggle.querySelector('span') : null;
+
             navButtons.forEach(button => {
                 button.addEventListener('click', () => {
-                    showMainTab(button.dataset.tab);
+                    const targetTabId = button.dataset.tab;
+
+                    // Lógica de toggle para Notificações
+                    if (targetTabId === 'notificacoes') {
+                        if (activeTabId === 'notificacoes') {
+                            // Se já estiver na aba de notificações, volte ao feed
+                            showTab('feed');
+                            return; // Encerra a execução aqui
+                        } else {
+                            // Se não, apenas esconda o ponto de notificação
+                            if (notificationDot) {
+                                notificationDot.classList.add('hidden');
+                            }
+                        }
+                    }
+
+                    showTab(targetTabId);
+
+                    // Se for um botão do sidebar, feche o sidebar
+                    if (button.closest('#sidebar')) {
+                        toggleSidebar();
+                    }
                 });
             });
 
-            // --- NAVEGAÇÃO PARA O PRONTUÁRIO ---
-            const viewPatientButtons = document.querySelectorAll('.view-patient-btn');
-            const backToPatientsButton = document.getElementById('back-to-patients');
-            const prontuarioNome = document.getElementById('prontuario-nome');
-            
-            viewPatientButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const patientName = button.dataset.patient;
-                    
-                    // Atualiza o nome no prontuário
-                    if(prontuarioNome) {
-                        prontuarioNome.textContent = `Prontuário: ${patientName}`;
+            function showTab(tabId) {
+                // Se a aba de destino não for válida (ex: null), não faça nada
+                if (!tabId) return;
+
+                contentTabs.forEach(tab => {
+                    if (tab.id === tabId) {
+                        tab.classList.remove('hidden-tab');
+                    } else {
+                        tab.classList.add('hidden-tab');
                     }
-                    if(pageTitle) {
-                        pageTitle.textContent = `Prontuário: ${patientName}`;
+                });
+
+                activeTabId = tabId; // Atualiza a aba ativa
+
+                // Atualiza os botões de navegação DENTRO do sidebar
+                const sidebarNavButtons = sidebar.querySelectorAll('.nav-button');
+                sidebarNavButtons.forEach(btn => {
+                    if (btn.dataset.tab === tabId) {
+                        btn.classList.add('text-white', 'bg-primary-dark'); // Cor ativa
+                        btn.classList.remove('text-primary-text-darker', 'hover:bg-primary-dark');
+                    } else {
+                        btn.classList.add('text-primary-text-darker', 'hover:bg-primary-dark');
+                        btn.classList.remove('text-white', 'bg-primary-dark');
                     }
-                    
-                    // (Em um app real, aqui você carregaria os dados do paciente)
-                    showMainTab('prontuario');
-                    
-                    // Garante que a primeira sub-aba (Dados do App) esteja visível
-                    showProntuarioTab('app-data');
-                });
-            });
-
-            // Botão "Voltar" do prontuário
-            if(backToPatientsButton) {
-                backToPatientsButton.addEventListener('click', () => {
-                    showMainTab('pacientes');
-                });
-            }
-
-            // --- NAVEGAÇÃO DAS SUB-ABAS (DENTRO DO PRONTUÁRIO) ---
-            const prontuarioTabButtons = document.querySelectorAll('.prontuario-tab-btn');
-            const prontuarioTabContents = document.querySelectorAll('.prontuario-tab-content');
-
-            function showProntuarioTab(tabId) {
-                // Esconde todos os conteúdos das sub-abas
-                prontuarioTabContents.forEach(content => {
-                    content.style.display = 'none';
                 });
                 
-                // Mostra o conteúdo da sub-aba alvo
-                const targetContent = document.getElementById(`prontuario-${tabId}`);
-                if (targetContent) {
-                    targetContent.style.display = 'block';
+                // Recria ícones se a aba alvo for 'add-post', 'pacientes' ou 'agenda'
+                if (['add-post', 'pacientes', 'agenda', 'config', 'notificacoes'].includes(tabId)) {
+                    lucide.createIcons();
                 }
+            }
 
-                // Atualiza o estilo dos botões das sub-abas
-                prontuarioTabButtons.forEach(btn => {
-                    if (btn.dataset.tab === tabId) {
-                        btn.classList.add('border-primary', 'text-primary');
-                        btn.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
-                    } else {
-                        btn.classList.remove('border-primary', 'text-primary');
-                        btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            // --- LÓGICA DO MODAL DE ALERTA ---
+            const modal = document.getElementById('custom-modal');
+            const modalMessage = document.getElementById('modal-message');
+            const modalCloseBtn = document.getElementById('modal-close');
+
+            function showModal(message) {
+                modalMessage.textContent = message;
+                modal.classList.remove('hidden');
+            }
+            if (modalCloseBtn) {
+                modalCloseBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                });
+            }
+            
+            // --- LÓGICA DO DIÁRIO (POSTAR DICA - MÉDICO) ---
+            const diarioTexto = document.getElementById('diario-texto');
+            const diarioRefeicao = document.getElementById('diario-refeicao');
+            const salvarDiarioBtn = document.getElementById('salvar-diario');
+            const feedEntradas = document.getElementById('feed-container');
+            const fotoInput = document.getElementById('diario-foto-input');
+            const fotoPreview = document.getElementById('foto-preview');
+            const fotoLabel = document.getElementById('foto-label');
+
+            let fotoUrl = null; 
+
+            // Preview da imagem
+            if (fotoInput) {
+                fotoInput.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            fotoUrl = e.target.result;
+                            fotoPreview.src = fotoUrl;
+                            fotoPreview.classList.remove('hidden');
+                            fotoLabel.textContent = file.name;
+                        };
+                        reader.readAsDataURL(file);
                     }
                 });
             }
             
-            // Adiciona evento de clique aos botões das sub-abas
-            prontuarioTabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    showProntuarioTab(button.dataset.tab);
-                });
-            });
+            // Salvar diário (Publicar Dica)
+            if (salvarDiarioBtn) {
+                salvarDiarioBtn.addEventListener('click', () => {
+                    const texto = diarioTexto.value.trim();
+                    const refeicao = diarioRefeicao.value; // (Dica, Receita, etc.)
+                    
+                    if (!texto && !fotoUrl) {
+                        showModal("Por favor, escreva uma legenda ou adicione uma foto.");
+                        return;
+                    }
 
-            // Estado inicial (Mostra o Dashboard)
-            showMainTab('dashboard');
+                    const data = new Date();
+                    const dataFormatada = data.toLocaleDateString('pt-BR', { 
+                        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                    });
+                    const postId = `post-med-${Date.now()}`;
+                    
+                    // Post de médico é sempre público e não é exceção
+                    const visibility = 'public';
+                    const postBgClass = 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800'; // Cor de post de médico
+                    
+                    const placeholderImg = 'https://placehold.co/600x400/EBFBE5/34592A?text=Dica+do+M%C3%A9dico';
+
+                    const novaEntradaHTML = `
+                        <div class="w-full border-b ${postBgClass} post-container" data-post-id="${postId}" data-visibility="${visibility}">
+                            <!-- Cabeçalho do Post -->
+                            <div class="flex items-center p-3">
+                                <img src="https://placehold.co/32x32/EBFBE5/34592A?text=M" class="w-8 h-8 rounded-full mr-3" alt="Foto perfil">
+                                <span class="font-semibold text-sm dark:text-white">medico_jean</span>
+                                <span class="ml-2 px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-medium">Médico</span>
+                                <i data-lucide="more-horizontal" class="ml-auto w-4 h-4 text-gray-500"></i>
+                            </div>
+                            <!-- Imagem do Post -->
+                            <img 
+                                src="${fotoUrl || placeholderImg}" 
+                                alt="Foto da dica" 
+                                class="w-full h-auto max-h-[70vh] object-cover ${!fotoUrl ? 'hidden' : ''}"
+                                onerror="this.onerror=null;this.src='${placeholderImg}';"
+                            >
+                            <!-- Conteúdo (Texto) - Exibido se NÃO houver foto, ou se houver texto -->
+                            ${(texto && !fotoUrl) ? `
+                            <div class="p-4 pt-0">
+                                <p class="text-gray-800 dark:text-gray-200 text-base"><b>[${refeicao}]</b> ${texto.replace(/\n/g, '<br>')}</p>
+                            </div>
+                            ` : ''}
+
+                            <!-- Ações do Post (Simulado) -->
+                            <div class="flex items-center space-x-4 p-3 ${ (texto && !fotoUrl) ? 'pt-0' : '' }">
+                                <i data-lucide="heart" class="w-5 h-5 cursor-pointer hover:text-red-500"></i>
+                                <i data-lucide="message-circle" class="w-5 h-5 cursor-pointer hover:text-blue-500 view-comments-btn"></i>
+                            </div>
+                            <!-- Legenda do Post - Exibida se HOUVER foto E texto -->
+                            ${(texto && fotoUrl) ? `
+                            <div class="px-3 pb-2 text-sm">
+                                <p><span class="font-semibold dark:text-white">medico_jean</span> <b>[${refeicao}]</b> ${texto.replace(/\n/g, '<br>')}</p>
+                            </div>
+                            ` : ''}
+                            <!-- Data -->
+                            <div class="px-3 pb-2 text-sm">
+                                <span class="text-xs text-gray-400 dark:text-gray-500 uppercase mt-1 block">${dataFormatada}</span>
+                            </div>
+                            
+                            <!-- Seção de Comentários -->
+                            <a href="#" class="text-xs text-gray-400 dark:text-gray-500 px-3 pb-2 block view-comments-btn">Ver comentários</a>
+                            <div class="comment-section hidden px-3 pb-2">
+                                <div class="comment-list space-y-1">
+                                    <!-- Comentários do storage vão aqui -->
+                                </div>
+                            </div>
+                            <input type="text" class="add-comment-input w-full border-t border-gray-200 dark:border-gray-700 bg-green-50 dark:bg-green-900/30 dark:text-white px-3 py-2 text-sm placeholder-gray-400 dark:placeholder-gray-500" placeholder="Adicione um comentário...">
+                        </div>
+                    `;
+                    
+                    feedEntradas.insertAdjacentHTML('afterbegin', novaEntradaHTML);
+                    lucide.createIcons(); // Recria ícones para o novo post
+                    
+                    // Limpa os campos
+                    diarioTexto.value = '';
+                    fotoInput.value = ''; 
+                    fotoPreview.src = '';
+                    fotoPreview.classList.add('hidden');
+                    fotoUrl = null;
+                    fotoLabel.textContent = 'Adicionar Foto (Opcional)';
+
+                    // Manda o usuário de volta para o feed
+                    showTab('feed');
+                });
+            }
+
+            // --- INICIALIZAÇÃO E EVENT LISTENERS DO FEED ---
+            loadLikesAndComments(); // Carrega curtidas e comentários salvos
+
+            if (feedContainer) {
+                feedContainer.addEventListener('click', (e) => {
+                    const likeIcon = e.target.closest('[data-lucide="heart"]');
+                    const viewComments = e.target.closest('.view-comments-btn');
+
+                    if (likeIcon) {
+                        handleLikeClick(likeIcon);
+                    }
+                    if (viewComments) {
+                        e.preventDefault();
+                        handleViewCommentsClick(viewComments);
+                    }
+                });
+
+                feedContainer.addEventListener('keydown', (e) => {
+                    if (e.target.classList.contains('add-comment-input') && e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddComment(e.target);
+                    }
+                });
+            }
+
+            // Estado inicial: Mostrar a aba 'feed'
+             showTab('feed');
+
         });
     </script>
 </body>
